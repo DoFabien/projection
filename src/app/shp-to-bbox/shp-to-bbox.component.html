@@ -1,0 +1,63 @@
+<input type="file" id="file" accept="..shp , .SHP" (change)="onChange($event)" />
+
+<div class="tableData">
+    <div class="headerTable">
+        <table style="width:100%" class="coords_list">
+            <tr class="headerTableTr ">
+                <th width="50px">
+                </th>
+                <th width="150px" style="max-width: 150px;" class="align-left">
+                    <p md-line (click)="orderBy('code')" class="pointer"> Code
+                        <i *ngIf="orderby == 'code'" class="material-icons">expand_less</i>
+                        <i *ngIf="orderby == '-' + 'code'" class="material-icons">expand_more</i>
+                        <i *ngIf="orderby != '-' + 'code' && orderby != 'code'" class="material-icons">remove</i>
+                    </p>
+                </th>
+                <th width="200px" style="max-width: 200px;"  class="align-left">
+                    <p md-line (click)="orderBy('name')" class="pointer"> Nom
+                        <i *ngIf="orderby == 'name'" class="material-icons">expand_less</i>
+                        <i *ngIf="orderby == '-' + 'name'" class="material-icons">expand_more</i>
+                        <i *ngIf="orderby != '-' + 'name' && orderby != 'name'" class="material-icons">remove</i>
+                    </p>
+                </th>
+                <tr>
+        </table>
+    </div>
+
+
+
+    <div id="list_coord">
+        <table style="width:100%">
+            <tr class="lighting" (click)="onClickProjection(p)" [id]="p.code" *ngFor="let p of data | myOrderBy: orderby; let i = index">
+
+                <td width="50px"  style="text-align:center">
+                    <i *ngIf="selectedProjection.code == p.code" class="material-icons icon-selected">radio_button_checked</i>
+                    <i *ngIf="selectedProjection.code !== p.code" class="material-icons icon-unselected">radio_button_unchecked</i>
+                </td>
+
+                <td width="150px" style="max-width: 150px;" [ngClass]="{'selected': selectedProjection.code == p.code }">
+                    <div> {{p.code}} </div>
+                </td>
+
+                <td width="200px" style="max-width: 200px;" [ngClass]="{'selected': selectedProjection.code == p.code }">
+                    <p>{{p.name}}</p>
+                </td>
+
+            </tr>
+        </table>
+    </div>
+</div>
+<div id="selected_projection">
+    <md-card>
+        <div *ngIf="selectedProjection.code">
+            <b>Code :</b> <a href="{{selectedProjection.url}}" target="_blank"> {{selectedProjection.code}} </a> <b style="margin-left: 20px;">  Région :</b>            {{selectedProjection.region}}
+            <br> <b>Nom :</b> {{selectedProjection.name}}
+        </div>
+
+        <div *ngIf="!selectedProjection.code">
+            <b> .shp -> map</b> <br>
+            <i>Selectionner un .shp puis selectionner un système de projection</i>
+        </div>
+
+    </md-card>
+</div>

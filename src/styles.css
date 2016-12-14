@@ -1,0 +1,43 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+a {
+    color: #03A9F4;
+}
+
+.extra-marker .fa-number:before {
+    font-style: normal;
+    font-weight: bolder;
+    font-family: sans-serif;
+}
+
+.selected {
+    font-weight: bold;
+    color: #3F51B5;
+}
+
+.icon-selected{
+ color:#3F51B5;
+}
+.icon-unselected{
+    color: #6D6D6D;
+}
+
+.pointer { 
+  cursor: pointer; 
+  }
+
+.lighting
+{
+    cursor: pointer; 
+    background-color: white;
+}
+ 
+.lighting:hover
+{
+    background-color: #E8EAF6;
+}

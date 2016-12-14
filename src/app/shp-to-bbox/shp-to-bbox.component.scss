@@ -1,0 +1,69 @@
+$footerHeigth: 120px;
+
+#list_coord {
+  position: absolute;
+  top: 58px;
+  bottom: $footerHeigth;
+  width: 100%;
+  overflow: auto;
+  z-index: 0;
+}
+
+
+i {
+  vertical-align: text-top;
+}
+
+.footer {
+ 
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  height: 150px;
+  
+}
+md-card {  
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    background-color: whitesmoke;
+    margin: 10px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: $footerHeigth - 60px;
+  
+}
+
+p {
+  margin-bottom: 0;
+  width: 100%;                   
+  overflow: hidden;              
+  text-overflow: ellipsis;
+}
+
+table {
+    border-collapse: collapse;
+}
+th, td {
+    border-bottom: 1px solid #ddd;
+}
+
+
+.align-left{
+    text-align: initial
+}
+
+ tr{
+    border-bottom: #ddd;
+    border-bottom-style: solid;
+    border-bottom-width: thin;
+      height: 50px;
+}
+
+td{
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    
+}
