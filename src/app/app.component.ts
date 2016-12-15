@@ -50,7 +50,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   //red orange-dark orange yellow blue-dark blue cyan purple violet pink green-dark green green-light black white
-  //Vietnam Indonesia Western Sahara Morocco Algeria Tunisia
   getColorIcon = function (region) {
     switch (region) {
       case 'World': return 'blue-dark';
@@ -83,12 +82,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   };
 
-
-
-
-
-
-
   drawMarkerFromCoords(coords_list) {
 
     this.markerLayer.clearLayers();
@@ -118,7 +111,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onClickPolygon = function (e) {
     this.projectionsService.eventProjectionCodeSelect.emit({ code: e.target.code, fromMap: true });
-    //this.selected_projection_code = e.target.code;
     this.setPolygonStyle(e.target.code);
 
   };
@@ -191,18 +183,14 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getLocation = function () {
 
-
     this.geocoderService.getLocation()
       .subscribe(location => {
         this.locationLayer.clearLayers();
         let coordsLocation = { lat: parseFloat(location.coords.latitude), lng: parseFloat(location.coords.longitude) };
         this.locationInit = [coordsLocation.lat, coordsLocation.lng];
-        this.map.panTo(coordsLocation);
-
-        if (this.map.getZoom() < 13)
-          this.map.setZoom(13);
-
-
+        let zoom = (this.map.getZoom() < 13) ? 13 : this.map.getZoom();
+        this.map.setView(coordsLocation, zoom);
+      
         L.marker(coordsLocation, {
           icon: L.icon({
             iconUrl: './assets/location.png',
@@ -225,14 +213,14 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.locationInit) {
       this.map = L.map('map').setView(this.locationInit, 13);
     } else {
-      this.map = L.map('map').setView([48, 7], 13);
+      this.map = L.map('map').setView([48,5], 6);
     }
 
     this.markerLayer = L.featureGroup();
     this.markerLayer.addTo(this.map);
     this.locationLayer = L.featureGroup();
     this.locationLayer.addTo(this.map);
-    this.getLocation();
+  
 
 
     var CLE_IGN = "7w0sxl9imubregycnsqerliz";
@@ -268,6 +256,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
 
+  this.getLocation();
     this.projectionsService.eventProjsectionsFromWGS84.subscribe((data) => {
       let latlng = data.coordsClick;
       this.markerLayer.clearLayers();

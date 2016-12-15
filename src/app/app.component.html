@@ -2,72 +2,71 @@
   <div class="nav">
 
     <button md-raised-button color="primary" [disabled]="this.router.url == '/point-to-coords'" [routerLink]="['point-to-coords']"
-    md-tooltip="Points -> Coordonées " tooltip-position="below" >
+      md-tooltip="Points -> Coordonées " tooltip-position="below">
     <md-icon><i class="material-icons">location_on</i></md-icon>
      <md-icon><i class="material-icons">keyboard_arrow_right</i></md-icon> 
      <div>x/y</div>
     </button>
-    
+
     <button md-raised-button color="primary" [disabled]="this.router.url == '/coords-to-points'" [routerLink]="['coords-to-points']"
-    md-tooltip="Coordonées -> Points " tooltip-position="below" >
+      md-tooltip="Coordonées -> Points " tooltip-position="below">
     <div>x/y</div>
     <md-icon><i class="material-icons">keyboard_arrow_right</i></md-icon>
     <md-icon><i class="material-icons">location_on</i></md-icon>
     </button>
 
-    <button md-raised-button color="primary" [disabled]="this.router.url == '/shp-to-bbox'" [routerLink]="['shp-to-bbox']"
-    md-tooltip=".shp -> map (bounding box)" tooltip-position="below" >
+    <button md-raised-button color="primary" [disabled]="this.router.url == '/shp-to-bbox'" [routerLink]="['shp-to-bbox']" md-tooltip=".shp -> map (bounding box)"
+      tooltip-position="below">
     <div>.shp </div>
      <md-icon><i class="material-icons">keyboard_arrow_right</i></md-icon> 
      <md-icon><i class="material-icons">map</i></md-icon> 
     </button>
 
     <button md-raised-button color="primary" [disabled]="this.router.url == '/bbox-to-coords'" [routerLink]="['bbox-to-coords']"
-     md-tooltip="Bounding box -> coordonnées" tooltip-position="below" >
+      md-tooltip="Bounding box -> coordonnées" tooltip-position="below">
 
     <div>Bbox</div>
     <md-icon><i class="material-icons">keyboard_arrow_right</i></md-icon> 
     <div>x/y</div>
     </button>
 
-  
 
-  <form autocomplete="off" style="display: inline;" (ngSubmit)="geocode(geocodeText)" >
-        <md-input name="Se localiser"  placeholder="Rechercher un lieu" [(ngModel)]="geocodeText">
-          <span class="pointer" md-suffix > 
+
+    <form autocomplete="off" style="display: inline;" (ngSubmit)="geocode(geocodeText)">
+      <md-input name="Se localiser" placeholder="Rechercher un lieu" [(ngModel)]="geocodeText">
+        <span class="pointer" md-suffix> 
                     <i class="material-icons" (click) = "geocodeText = ''" style = "vertical-align: bottom; cursor: pointer;">clear</i> 
                 </span>
-        </md-input>
-        <button md-mini-fab type="submit" [disabled] = "!geocodeText || geocodeText == ''">
+      </md-input>
+      <button md-mini-fab type="submit" [disabled]="!geocodeText || geocodeText == ''">
                 <md-icon class="md-24">location_on</md-icon>
             </button>
-          
-              <button md-mini-fab [color]= 'primary' (click)="getLocation()" >
+    </form>
+
+    <button md-mini-fab [color]='primary' (click)="getLocation()">
                 <md-icon class="md-24">my_location</md-icon>
             </button>
-      </form>
-
   </div>
 
   <div class="filter">
 
-      <form id="filterForm" (ngSubmit)="this.projectionsService.setFilterText(filterText)" autocomplete="off" style="display: inline;">
-        <md-input name="filter" ngModel #filter [(ngModel)]="filterText" placeholder="Filtrer par nom ou SRID">
-          <span class="pointer" md-suffix (click)="this.projectionsService.setFilterText(''); filterText=''; "> 
+    <form id="filterForm" (ngSubmit)="this.projectionsService.setFilterText(filterText)" autocomplete="off" style="display: inline;">
+      <md-input name="filter" ngModel #filter [(ngModel)]="filterText" placeholder="Filtrer par nom ou SRID">
+        <span class="pointer" md-suffix (click)="this.projectionsService.setFilterText(''); filterText=''; "> 
                     <i class="material-icons" style = "vertical-align: bottom; cursor: pointer;">clear</i> 
                 </span>
-        </md-input>
-        <button md-mini-fab type="submit" [disabled]="!filterText">
+      </md-input>
+      <button md-mini-fab type="submit" [disabled]="!filterText">
                 <md-icon class="md-24">filter_list</md-icon>
             </button>
-      </form>
+    </form>
 
 
 
-      <md-slide-toggle [(ngModel)]="projectionsService.filterBbox" (change)='filterBoboxChange($event)' style="float: left;"
-       md-tooltip="Exclure les systèmes de coordonnées par zone de couverture" tooltip-position="below" >
-        Filter par Bbox
-      </md-slide-toggle>
+    <md-slide-toggle [(ngModel)]="projectionsService.filterBbox" (change)='filterBoboxChange($event)' style="float: left;" md-tooltip="Exclure les systèmes de coordonnées par zone de couverture"
+      tooltip-position="below">
+      Filter par Bbox
+    </md-slide-toggle>
 
 
   </div>
