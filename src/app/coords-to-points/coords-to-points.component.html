@@ -10,7 +10,7 @@
                     (paste)="onPastLng($event)"
                     [dividerColor]="lngModel.valid ? 'primary' : 'warn'"
                     required
-                    pattern="\s*?[0-9]*\.?[0-9]*?\s*?">
+                    pattern="\s*?-?[0-9]*\.?[0-9]*?\s*?">
                        <md-hint class="errorMessage" align="end"> {{(!lngModel.valid && lngModel.touched) ? 'Format invalide' :'' }} </md-hint>
                 </md-input>
              
@@ -26,7 +26,7 @@
                     [(ngModel)]="inputCoords.lat" 
                     [dividerColor]="latModel.valid ? 'primary' : 'warn'"
                     required
-                    pattern="\s*?[0-9]*\.?[0-9]*?\s*?">
+                    pattern="\s*?-?[0-9]*\.?[0-9]*?\s*?">
                        <md-hint class="errorMessage" align="end"> {{(!latModel.valid && latModel.touched) ? 'Format invalide' :'' }} </md-hint>
                 </md-input>
             </td>

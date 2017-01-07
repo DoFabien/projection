@@ -90,7 +90,7 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
     }
 
     // Qgis like (12.345,6.7891)
-    if (new RegExp('^[0-9]+\\.?[0-9]*\\s?,\\s?[0-9]+\\.?[0-9]*$','g').test(data)) {
+    if (new RegExp('^-?[0-9]+\\.?[0-9]*\\s?,\\s?-?[0-9]+\\.?[0-9]*$','g').test(data)) {
       e.preventDefault();
       this.inputCoords.lng = data.split(',')[0].trim();
       this.inputCoords.lat = data.split(',')[1].trim();
@@ -98,7 +98,7 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
     // si on reconnait un WKT
     if (new RegExp('(LIneString|Point|Polygon|MULTIPOLYGON|MULTIPOINT|MULTILINESTRING)\\s*\\(+[0-9]+\\.?[0-9]*\\s[0-9]+\\.?[0-9]', 'i').test(data)) {
 
-      let wkt_corrds = /([0-9]+\.?[0-9]*\s[0-9]+\.?[0-9]*)/.exec(data); // 1ere coordonnées
+      let wkt_corrds = /(-?[0-9]+\.?[0-9]*\s-?[0-9]+\.?[0-9]*)/.exec(data); // 1ere coordonnées
       e.preventDefault();
       this.inputCoords.lng = wkt_corrds[0].split(' ')[0].trim();
       this.inputCoords.lat = wkt_corrds[0].split(' ')[1].trim();
