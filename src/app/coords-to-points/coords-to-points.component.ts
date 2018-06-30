@@ -1,22 +1,20 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ProjectionsService } from '../shared/projections.service';
 
-import { MdIconRegistry } from '@angular2-material/icon';
-
 
 @Component({
-  selector: 'my-coords-to-points',
+  selector: 'app-coords-to-points',
   templateUrl: './coords-to-points.component.html',
-  styleUrls: ['./coords-to-points.component.scss'],
-  viewProviders: [MdIconRegistry]
+  styleUrls: ['./coords-to-points.component.scss']
 })
 export class CoordsToPointsComponent implements OnInit, OnDestroy {
 
-  data: any = [];
   inputCoords = { lat: null, lng: null };
   lngIsValid = false;
   latIsValid = false;
   selectedProjection = { code: null };
+  data: any = [];
+  orderby;
 
 
   subscriptionDataLoad;
@@ -66,7 +64,7 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
     if (latlng[0] && latlng[1]) {
       this.projectionsService.getProjectionsToWGS84(latlng[0], latlng[1]);
     }
-  };
+  }
 
   scrollToSelectedProjection = function (code) {
     if (document.getElementById(code)) {
@@ -82,27 +80,27 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
     let data: string;
     if (e.clipboardData) {
       data = e.clipboardData.getData('text/plain').trim();
-    }
-    else if ((<any>window).clipboardData) { // IE...
+    } else if ((<any>window).clipboardData) { // IE...
       data = (<any>window).clipboardData.getData('Text');
     } else {
       return;
     }
 
     // Qgis like (12.345,6.7891)
-    if (new RegExp('^-?[0-9]+\\.?[0-9]*\\s?,\\s?-?[0-9]+\\.?[0-9]*$','g').test(data)) {
+    if (new RegExp('^-?[0-9]+\\.?[0-9]*\\s?,\\s?-?[0-9]+\\.?[0-9]*$', 'g').test(data)) {
       e.preventDefault();
       this.inputCoords.lng = data.split(',')[0].trim();
       this.inputCoords.lat = data.split(',')[1].trim();
     }
     // si on reconnait un WKT
-    if (new RegExp('(LIneString|Point|Polygon|MULTIPOLYGON|MULTIPOINT|MULTILINESTRING)\\s*\\(+[0-9]+\\.?[0-9]*\\s[0-9]+\\.?[0-9]', 'i').test(data)) {
+    // tslint:disable-next-line:max-line-length
+    if (new RegExp('(LineString|Point|Polygon|MULTIPOLYGON|MULTIPOINT|MULTILINESTRING)\\s*\\(+[0-9]+\\.?[0-9]*\\s[0-9]+\\.?[0-9]', 'i').test(data)) {
 
-      let wkt_corrds = /(-?[0-9]+\.?[0-9]*\s-?[0-9]+\.?[0-9]*)/.exec(data); // 1ere coordonnées
+      const wkt_corrds = /(-?[0-9]+\.?[0-9]*\s-?[0-9]+\.?[0-9]*)/.exec(data); // 1ere coordonnées
       e.preventDefault();
       this.inputCoords.lng = wkt_corrds[0].split(' ')[0].trim();
       this.inputCoords.lat = wkt_corrds[0].split(' ')[1].trim();
-    };
+    }
   };
 
   reverseLngLat = function (lng, lat, isValid) {
@@ -114,8 +112,8 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
   };
 
   onClickProjection = function (_projection_selected) {
-    if (this.inputCoords.lng && this.inputCoords.lat){
-            this.projectionsService.setProjectionCodeSelected({ code: _projection_selected.code, fromMap: false });
+    if (this.inputCoords.lng && this.inputCoords.lat) {
+      this.projectionsService.setProjectionCodeSelected({ code: _projection_selected.code, fromMap: false });
     }
 
   };

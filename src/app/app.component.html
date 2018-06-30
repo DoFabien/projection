@@ -1,72 +1,97 @@
 <header>
   <div class="nav">
 
-    <button md-raised-button color="primary" [disabled]="this.router.url == '/point-to-coords'" [routerLink]="['point-to-coords']"
-      md-tooltip="Points -> Coordonées " tooltip-position="below">
-    <md-icon><i class="material-icons">location_on</i></md-icon>
-     <md-icon><i class="material-icons">keyboard_arrow_right</i></md-icon> 
+    <button mat-raised-button color="primary" 
+      class="toolbarElems"
+      [disabled]="this.router.url == '/point-to-coords'" 
+      [routerLink]="['point-to-coords']"
+      matTooltip="Points -> Coordonées " tooltip-position="below">
+    <mat-icon><i class="material-icons">location_on</i></mat-icon>
+     <mat-icon><i class="material-icons">keyboard_arrow_right</i></mat-icon>
      <div>x/y</div>
     </button>
 
-    <button md-raised-button color="primary" [disabled]="this.router.url == '/coords-to-points'" [routerLink]="['coords-to-points']"
-      md-tooltip="Coordonées -> Points " tooltip-position="below">
+    <button mat-raised-button color="primary"
+      class="toolbarElems"
+      [disabled]="this.router.url == '/coords-to-points'" 
+      [routerLink]="['coords-to-points']"
+      matTooltip="Coordonées -> Points " tooltip-position="below">
     <div>x/y</div>
-    <md-icon><i class="material-icons">keyboard_arrow_right</i></md-icon>
-    <md-icon><i class="material-icons">location_on</i></md-icon>
+    <mat-icon><i class="material-icons">keyboard_arrow_right</i></mat-icon>
+    <mat-icon><i class="material-icons">location_on</i></mat-icon>
     </button>
 
-    <button md-raised-button color="primary" [disabled]="this.router.url == '/shp-to-bbox'" [routerLink]="['shp-to-bbox']" md-tooltip=".shp -> map (bounding box)"
+    <button mat-raised-button color="primary"
+      class="toolbarElems"
+      [disabled]="this.router.url == '/shp-to-bbox'" 
+      [routerLink]="['shp-to-bbox']"
+      matTooltip=".shp -> map (bounding box)"
       tooltip-position="below">
     <div>.shp </div>
-     <md-icon><i class="material-icons">keyboard_arrow_right</i></md-icon> 
-     <md-icon><i class="material-icons">map</i></md-icon> 
+     <mat-icon><i class="material-icons">keyboard_arrow_right</i></mat-icon>
+     <mat-icon><i class="material-icons">map</i></mat-icon>
     </button>
 
-    <button md-raised-button color="primary" [disabled]="this.router.url == '/bbox-to-coords'" [routerLink]="['bbox-to-coords']"
-      md-tooltip="Bounding box -> coordonnées" tooltip-position="below">
+    <button mat-raised-button color="primary"
+      class="toolbarElems"
+      [disabled]="this.router.url == '/bbox-to-coords'" 
+      [routerLink]="['bbox-to-coords']"
+      matTooltip="Bounding box -> coordonnées" tooltip-position="below">
 
     <div>Bbox</div>
-    <md-icon><i class="material-icons">keyboard_arrow_right</i></md-icon> 
+    <mat-icon><i class="material-icons">keyboard_arrow_right</i></mat-icon>
     <div>x/y</div>
     </button>
+
 
 
 
     <form autocomplete="off" style="display: inline;" (ngSubmit)="geocode(geocodeText)">
-      <md-input name="Se localiser" placeholder="Rechercher un lieu" [(ngModel)]="geocodeText">
-        <span class="pointer" md-suffix> 
-                    <i class="material-icons" (click) = "geocodeText = ''" style = "vertical-align: bottom; cursor: pointer;">clear</i> 
-                </span>
-      </md-input>
-      <button md-mini-fab type="submit" [disabled]="!geocodeText || geocodeText == ''">
-                <md-icon class="md-24">location_on</md-icon>
-            </button>
+      <mat-form-field>
+          <input matInput  name="Se localiser" placeholder="Rechercher un lieu" [(ngModel)]="geocodeText">
+          <mat-icon matSuffix (click) = "geocodeText = ''" style = "vertical-align: bottom; cursor: pointer;" >clear</mat-icon>
+        </mat-form-field>
+
+      <button mat-mini-fab type="submit"
+        [disabled]="!geocodeText || geocodeText == ''"
+        class="toolbarElems">
+                <mat-icon class="mat-24">location_on</mat-icon>
+        </button>
     </form>
 
-    <button md-mini-fab [color]='primary' (click)="getLocation()">
-                <md-icon class="md-24">my_location</md-icon>
-            </button>
+       <button mat-mini-fab color='primary' 
+          (click)="getLocation()"
+          class="toolbarElems">
+                <mat-icon class="mat-24">my_location</mat-icon>
+        </button>
   </div>
 
   <div class="filter">
 
-    <form id="filterForm" (ngSubmit)="this.projectionsService.setFilterText(filterText)" autocomplete="off" style="display: inline;">
-      <md-input name="filter" ngModel #filter [(ngModel)]="filterText" placeholder="Filtrer par nom ou SRID">
-        <span class="pointer" md-suffix (click)="this.projectionsService.setFilterText(''); filterText=''; "> 
-                    <i class="material-icons" style = "vertical-align: bottom; cursor: pointer;">clear</i> 
-                </span>
-      </md-input>
-      <button md-mini-fab type="submit" [disabled]="!filterText">
-                <md-icon class="md-24">filter_list</md-icon>
+    <form id="filterForm" (ngSubmit)="this.projectionsService.setFilterText(filterText)"
+        autocomplete="off" style="display: inline;">
+        <mat-form-field>
+            <input matInput  name="filter" ngModel #filter [(ngModel)]="filterText" placeholder="Filtrer par nom ou SRID">
+            <mat-icon matSuffix (click)="this.projectionsService.setFilterText(''); filterText=''; " style = "vertical-align: bottom; cursor: pointer;" >clear</mat-icon>
+          </mat-form-field>
+
+        <!-- <span class="pointer" mat-suffix (click)="this.projectionsService.setFilterText(''); filterText=''; ">
+                    <i class="material-icons" style = "vertical-align: bottom; cursor: pointer;">clear</i>
+                </span> -->
+
+      <button mat-mini-fab type="submit" [disabled]="!filterText">
+                <mat-icon class="mat-24">filter_list</mat-icon>
             </button>
     </form>
 
 
 
-    <md-slide-toggle [(ngModel)]="projectionsService.filterBbox" (change)='filterBoboxChange($event)' style="float: left;" md-tooltip="Exclure les systèmes de coordonnées par zone de couverture"
+    <mat-slide-toggle [(ngModel)]="projectionsService.filterBbox" (change)='filterBoboxChange($event)' 
+      style="float: left; height: 64px;" 
+      matTooltip="Exclure les systèmes de coordonnées par zone de couverture"
       tooltip-position="below">
       Filter par Bbox
-    </md-slide-toggle>
+    </mat-slide-toggle>
 
 
   </div>

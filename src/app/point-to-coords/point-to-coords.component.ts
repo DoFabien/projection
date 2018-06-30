@@ -4,7 +4,7 @@ import { ProjectionsService } from '../shared/projections.service';
 
 
 @Component({
-  selector: 'my-point-to-coords',
+  selector: 'app-point-to-coords',
   templateUrl: './point-to-coords.component.html',
   styleUrls: ['./point-to-coords.component.scss']
 })
@@ -34,10 +34,10 @@ export class PointToCoordsComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    //nouvelles data!
+    // nouvelles data!
     this.subscriptionNewData = this.projectionsService.eventProjsectionsFromWGS84.subscribe((data) => {
       this.data = data.result;
-      let projIsPresent = this.projectionsService.projIsPresent(this.selectedProjection.code, data.result);
+      const projIsPresent = this.projectionsService.projIsPresent(this.selectedProjection.code, data.result);
 
       if (projIsPresent) {
         this.selectedProjection = this.projectionsService.getProjectionByCode(this.selectedProjection.code, this.data);
@@ -46,12 +46,12 @@ export class PointToCoordsComponent implements OnInit, OnDestroy {
       }
     });
 
-    //chargements
+    // chargements
     this.subscriptionDataLoaded = this.projectionsService.eventProjsectionsLoaded.subscribe((data) => {
       this.data = data;
     });
 
-    //le filtre à changé
+    // le filtre a changé
     this.subscriptionNewFilter = this.projectionsService.eventFilterTextChange.subscribe((data) => {
       this.data = this.projectionsService.getFilterProjection();
       this.projectionsService.getProjsectionsFromWGS84(this.projectionsService.initCoords.pointToCoords.lng,
@@ -71,7 +71,7 @@ export class PointToCoordsComponent implements OnInit, OnDestroy {
         this.projectionsService.initCoords.pointToCoords.lat);
     }
 
-  };
+  }
 
 
   ngOnDestroy() {
