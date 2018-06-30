@@ -55,14 +55,14 @@ i {
 }
 
 .footer {
- 
+
   position: absolute;
   width: 100%;
   bottom: 0;
   height: 150px;
-  
+
 }
-md-card {  
+mat-card {
     font-family: Roboto, "Helvetica Neue", sans-serif;
     background-color: whitesmoke;
     margin: 10px;
@@ -71,13 +71,13 @@ md-card {
     bottom: 0;
     right: 0;
     height: $footerHeigth - 50px;
-  
+
 }
 
 p {
   margin-bottom: 0;
-  width: 100%;                   
-  overflow: hidden;              
+  width: 100%;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
@@ -97,10 +97,10 @@ td{
 
 .lighting
 {
-    cursor: pointer; 
+    cursor: pointer;
     background-color: white;
 }
- 
+
 .lighting:hover
 {
     background-color: #ddd;

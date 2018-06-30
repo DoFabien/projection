@@ -2,38 +2,42 @@
     <form class="formCoords" (ngSubmit)="submitNewCoords([inputCoords.lng,inputCoords.lat])" autocomplete="off">
     <table>
         <tr>
-            <td style="height:80px;">  
-                <md-input placeholder="Lng (x)" 
-                    name="lng"  
-                    #lngModel = "ngModel"
-                    [(ngModel)]="inputCoords.lng" 
-                    (paste)="onPastLng($event)"
-                    [dividerColor]="lngModel.valid ? 'primary' : 'warn'"
-                    required
-                    pattern="\s*?-?[0-9]*\.?[0-9]*?\s*?">
-                       <md-hint class="errorMessage" align="end"> {{(!lngModel.valid && lngModel.touched) ? 'Format invalide' :'' }} </md-hint>
-                </md-input>
-             
+            <td style="height:80px;">
+                <mat-form-field>
+                    <input matInput placeholder="Lng (x)"
+                        name="lng"
+                        #lngModel = "ngModel"
+                        [(ngModel)]="inputCoords.lng"
+                        (paste)="onPastLng($event)"
+
+                        required
+                        pattern="\s*?-?[0-9]*\.?[0-9]*?\s*?">
+                        <mat-hint class="errorMessage" align="end"> {{(!lngModel.valid && lngModel.touched) ? 'Format invalide' :'' }} </mat-hint>
+
+                </mat-form-field>
             </td>
 
             <td>
                 <i class="material-icons pointer" (click)="reverseLngLat(lngModel,latModel, [latModel.valid,lngModel.valid])">&#xE8D4;</i>
             </td>
             <td>
-              <md-input placeholder="Lat (y)" 
-                    name="lat"  
+            <mat-form-field>
+              <input  matInput placeholder="Lat (y)"
+                    name="lat"
                     #latModel = "ngModel"
-                    [(ngModel)]="inputCoords.lat" 
-                    [dividerColor]="latModel.valid ? 'primary' : 'warn'"
+                    [(ngModel)]="inputCoords.lat"
+
                     required
                     pattern="\s*?-?[0-9]*\.?[0-9]*?\s*?">
-                       <md-hint class="errorMessage" align="end"> {{(!latModel.valid && latModel.touched) ? 'Format invalide' :'' }} </md-hint>
-                </md-input>
-            </td>
 
+            </mat-form-field>
+
+            </td>
+            <!--                     [dividerColor]="latModel.valid ? 'primary' : 'warn'" -->
+            <!-- <mat-hint class="errorMessage" align="end"> {{(!latModel.valid && latModel.touched) ? 'Format invalide' :'' }} </mat-hint> -->
             <td>
-                <button [disabled]="!latModel.valid || !latModel.valid" style="margin-left: 5px;" md-mini-fab type="submit">
-                     <md-icon class="md-24">&#xE55F;</md-icon>
+                <button [disabled]="!latModel.valid || !latModel.valid" style="margin-left: 5px;" mat-mini-fab type="submit">
+                     <mat-icon class="mat-24">&#xE55F;</mat-icon>
                 </button>
             </td>
         </tr>
@@ -49,14 +53,14 @@
                 <th width="50px">
                 </th>
                 <th width="150px" style="max-width: 150px;">
-                    <p md-line (click)="orderBy('code')" class="pointer align-left"> Code
+                    <p mat-line (click)="orderBy('code')" class="pointer align-left"> Code
                         <i *ngIf="orderby == 'code'" class="material-icons">expand_less</i>
                         <i *ngIf="orderby == '-' + 'code'" class="material-icons">expand_more</i>
                         <i *ngIf="orderby != '-' + 'code' && orderby != 'code'" class="material-icons">remove</i>
                     </p>
                 </th>
                 <th width="200px" style="max-width: 200px;">
-                    <p md-line (click)="orderBy('name')" class="pointer align-left"> Nom
+                    <p mat-line (click)="orderBy('name')" class="pointer align-left"> Nom
                         <i *ngIf="orderby == 'name'" class="material-icons">expand_less</i>
                         <i *ngIf="orderby == '-' + 'name'" class="material-icons">expand_more</i>
                         <i *ngIf="orderby != '-' + 'name' && orderby != 'name'" class="material-icons">remove</i>
@@ -75,7 +79,7 @@
                <td width="50px" style="text-align:center" >
          <i *ngIf="selectedProjection.code == p.code" class="material-icons icon-selected">radio_button_checked</i>
          <i *ngIf="selectedProjection.code !== p.code" class="material-icons icon-unselected">radio_button_unchecked</i>
-         <!--<md-checkbox [checked]="(selectedProjection.code == p.code)" [disabled]="true" style="margin-left: 10px"></md-checkbox>-->
+         <!--<mat-checkbox [checked]="(selectedProjection.code == p.code)" [disabled]="true" style="margin-left: 10px"></mat-checkbox>-->
     </td>
 
                 <td width="150px" style="max-width: 150px;" [ngClass]="{'selected': selectedProjection.code == p.code }"  >
@@ -91,16 +95,17 @@
     </div>
 </div>
 <div id="selected_projection">
-    <md-card>
-        <div *ngIf="selectedProjection.code">
-            <b>Code :</b> <a href="{{selectedProjection.url}}" target="_blank"> {{selectedProjection.code}} </a> <b style="margin-left: 20px;">  Région :</b>            {{selectedProjection.region}}
-            <br> <b>Nom :</b> {{selectedProjection.name}}
+    <mat-card>
+        <div *ngIf="selectedProjection['code']">
+            <b>Code :</b> <a href="{{selectedProjection['url']}}" target="_blank">
+              {{selectedProjection['code']}} </a> <b style="margin-left: 20px;">  Région :</b>            {{selectedProjection['region']}}
+            <br> <b>Nom :</b> {{selectedProjection['name']}}
         </div>
 
-        <div *ngIf="!selectedProjection.code && !selectedProjection.lng">
+        <div *ngIf="!selectedProjection['code'] && !selectedProjection['lng']">
             <b> Coordonées -> Points </b> <br>
             <i>Entrer un couple de coordonées puis selectionner un système de projection  </i>
         </div>
 
-    </md-card>
+    </mat-card>
 </div>

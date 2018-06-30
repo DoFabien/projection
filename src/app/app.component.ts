@@ -1,33 +1,44 @@
+// import { Component } from '@angular/core';
+
+// @Component({
+//   selector: 'app-root',
+//   templateUrl: './app.component.html',
+//   styleUrls: ['./app.component.css']
+// })
+// export class AppComponent {
+//   title = 'app';
+// }
+
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 
 
 import { ProjectionsService } from './shared/projections.service';
 import { GeocoderService } from './shared/geocoder.service';
-import { Subscription } from 'rxjs/Subscription';
-import { MdUniqueSelectionDispatcher } from '@angular2-material/core';
+
+// import { MdUniqueSelectionDispatcher } from '@angular2-material/core';
 import { ActivatedRoute, Router, NavigationStart } from '@angular/router';
-import { MdIconRegistry } from '@angular2-material/icon';
+// import { MdIconRegistry } from '@angular2-material/icon';
 
 
 
 declare let L: any;
-
 @Component({
-  selector: 'my-app', // <my-app></my-app>
+  selector: 'app-app', // <app-app></app-app>
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  providers: [MdUniqueSelectionDispatcher],
-  viewProviders: [MdIconRegistry]
+  // providers: [MdUniqueSelectionDispatcher],
+  // viewProviders: [MdIconRegistry]
 })
 
 export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
-  subscription: Subscription;
+  // subscription: Subscription;
   filterText = '';
   map: any;
   markerLayer: any;
   locationLayer: any;
   coordsBbox = [];
   locationInit;
+  geocodeText;
 
 
   featureColor = {
@@ -38,7 +49,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(public projectionsService: ProjectionsService,
     private route: ActivatedRoute,
-    private router: Router,
+    public router: Router,
     private geocoderService: GeocoderService) {
     router.events.subscribe(e => {
       if (e instanceof NavigationStart) {
@@ -49,7 +60,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   }
 
-  //red orange-dark orange yellow blue-dark blue cyan purple violet pink green-dark green green-light black white
+  // red orange-dark orange yellow blue-dark blue cyan purple violet pink green-dark green green-light black white
   getColorIcon = function (region) {
     switch (region) {
       case 'World': return 'blue-dark';
@@ -85,10 +96,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   drawMarkerFromCoords(coords_list) {
 
     this.markerLayer.clearLayers();
-    let markers = L.markerClusterGroup({ maxClusterRadius: 30 });
+    const markers = L.markerClusterGroup({ maxClusterRadius: 30 });
     this.markerLayer.addLayer(markers);
     for (let i = 0; i < coords_list.length; i++) {
-      let extraMarkers = L.ExtraMarkers.icon({
+      const extraMarkers = L.ExtraMarkers.icon({
         icon: 'fa-number',
         iconColor: 'white',
         markerColor: this.getColorIcon(coords_list[i].region),
@@ -97,7 +108,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
         number: coords_list[i].region.substr(0, 3)
       });
 
-      let marker = L.marker([coords_list[i].lat, coords_list[i].lng], { icon: extraMarkers });
+      const marker = L.marker([coords_list[i].lat, coords_list[i].lng], { icon: extraMarkers });
       marker.code = coords_list[i].code;
 
       marker.on('click', function (e) {
@@ -151,7 +162,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.router.url === '/bbox-to-coords') {
       if (this.coordsBbox.length === 1) {
         this.markerLayer.clearLayers();
-        let rectangle = L.rectangle([this.coordsBbox[0], e.latlng]);
+        const rectangle = L.rectangle([this.coordsBbox[0], e.latlng]);
         rectangle.addTo(this.markerLayer);
       }
     }
@@ -172,10 +183,12 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe(res => {
 
         if (res.status === 'OK') {
-          let coordsGeocoder = res.results[0].geometry.location;
+          const coordsGeocoder = res.results[0].geometry.location;
           this.map.panTo(coordsGeocoder);
-          if (this.map.getZoom() < 13)
+          if (this.map.getZoom() < 13) {
             this.map.setZoom(13);
+          }
+
         }
       }
       );
@@ -186,11 +199,11 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.geocoderService.getLocation()
       .subscribe(location => {
         this.locationLayer.clearLayers();
-        let coordsLocation = { lat: parseFloat(location.coords.latitude), lng: parseFloat(location.coords.longitude) };
+        const coordsLocation = { lat: parseFloat(location.coords.latitude), lng: parseFloat(location.coords.longitude) };
         this.locationInit = [coordsLocation.lat, coordsLocation.lng];
-        let zoom = (this.map.getZoom() < 13) ? 13 : this.map.getZoom();
+        const zoom = (this.map.getZoom() < 13) ? 13 : this.map.getZoom();
         this.map.setView(coordsLocation, zoom);
-      
+
         L.marker(coordsLocation, {
           icon: L.icon({
             iconUrl: './assets/location.png',
@@ -209,40 +222,44 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   ngAfterViewInit() {
-    let that = this;
+    const that = this;
     if (this.locationInit) {
       this.map = L.map('map').setView(this.locationInit, 13);
     } else {
-      this.map = L.map('map').setView([48,5], 6);
+      this.map = L.map('map').setView([48, 5], 6);
     }
 
     this.markerLayer = L.featureGroup();
     this.markerLayer.addTo(this.map);
     this.locationLayer = L.featureGroup();
     this.locationLayer.addTo(this.map);
-  
 
 
-    var CLE_IGN = "7w0sxl9imubregycnsqerliz";
 
-    var url_ign_scan = "https://gpp3-wxs.ign.fr/" + CLE_IGN + "/wmts?LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS&EXCEPTIONS=text/xml&FORMAT=image/jpeg&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}"
-    var url_ign_parcelaire = "https://gpp3-wxs.ign.fr/" + CLE_IGN + "/wmts?LAYER=CADASTRALPARCELS.PARCELS&EXCEPTIONS=text/xml&FORMAT=image/png&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}"
-    var url_ign_ortho = "https://gpp3-wxs.ign.fr/" + CLE_IGN + "/wmts?LAYER=ORTHOIMAGERY.ORTHOPHOTOS&EXCEPTIONS=text/xml&FORMAT=image/jpeg&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}"
+    const CLE_IGN = '7w0sxl9imubregycnsqerliz';
 
-    var base_osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' })
-    var base_mapbox = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', { id: 'fabiendelolmo.h5p49m4f' })
-    var base_ign_scan = L.tileLayer(url_ign_scan, { attribution: '&copy; <a href="http://www.ign.fr/">IGN</a>' })
-    var base_ign_ortho = L.tileLayer(url_ign_ortho, { attribution: '&copy; <a href="http://www.ign.fr/">IGN</a>' })
-    var base_ign_parcelaire = L.tileLayer(url_ign_parcelaire, { attribution: '&copy; <a href="http://www.ign.fr/">IGN</a>' })
+    // tslint:disable-next-line:max-line-length
+    const url_ign_scan = 'https://gpp3-wxs.ign.fr/' + CLE_IGN + '/wmts?LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS&EXCEPTIONS=text/xml&FORMAT=image/jpeg&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}';
+    // tslint:disable-next-line:max-line-length
+    const url_ign_parcelaire = 'https://gpp3-wxs.ign.fr/' + CLE_IGN + '/wmts?LAYER=CADASTRALPARCELS.PARCELS&EXCEPTIONS=text/xml&FORMAT=image/png&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}';
+    // tslint:disable-next-line:max-line-length
+    const url_ign_ortho = 'https://gpp3-wxs.ign.fr/' + CLE_IGN + '/wmts?LAYER=ORTHOIMAGERY.ORTHOPHOTOS&EXCEPTIONS=text/xml&FORMAT=image/jpeg&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}';
 
-    base_osm.addTo(this.map)
+    const base_osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' });
+    const base_mapbox = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', { id: 'fabiendelolmo.h5p49m4f' });
+    const base_ign_scan = L.tileLayer(url_ign_scan, { attribution: '&copy; <a href="http://www.ign.fr/">IGN</a>' });
+    const base_ign_ortho = L.tileLayer(url_ign_ortho, { attribution: '&copy; <a href="http://www.ign.fr/">IGN</a>' });
+    const base_ign_parcelaire = L.tileLayer(url_ign_parcelaire, { attribution: '&copy; <a href="http://www.ign.fr/">IGN</a>' });
 
-    var baseMaps = {
-      "OSM": base_osm,
-      "Mapbox OSM": base_mapbox,
-      "Scan IGN": base_ign_scan,
-      "Ortho IGN": base_ign_ortho,
-      "Parcelaire IGN": base_ign_parcelaire
+    base_osm.addTo(this.map);
+
+    const baseMaps = {
+      'OSM': base_osm,
+      'Mapbox OSM': base_mapbox,
+      'Scan IGN': base_ign_scan,
+      'Ortho IGN': base_ign_ortho,
+      'Parcelaire IGN': base_ign_parcelaire
     };
 
     L.control.layers(baseMaps).addTo(this.map);
@@ -256,12 +273,12 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
 
-  this.getLocation();
+    this.getLocation();
     this.projectionsService.eventProjsectionsFromWGS84.subscribe((data) => {
-      let latlng = data.coordsClick;
+      const latlng = data.coordsClick;
       this.markerLayer.clearLayers();
       if (latlng.lat && latlng.lng) {
-        let extraMarkers = L.ExtraMarkers.icon({
+        const extraMarkers = L.ExtraMarkers.icon({
           icon: 'fa-number',
           iconColor: 'black',
           markerColor: 'white',
@@ -269,7 +286,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
           prefix: 'fa',
           number: '?'
         });
-        let marker = L.marker(latlng, { icon: extraMarkers });
+        const marker = L.marker(latlng, { icon: extraMarkers });
         marker.addTo(this.markerLayer);
       }
     });
@@ -279,7 +296,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.projectionsService.eventProjectionCodeSelect.subscribe((data) => {
       if (this.router.url === '/coords-to-points') {
         if (!data.fromMap) { // provient des données, on centre la map sur le marker
-          let markers = this.markerLayer.getLayers()[0].getLayers();
+          const markers = this.markerLayer.getLayers()[0].getLayers();
           for (let i = 0; i < markers.length; i++) {
             if (markers[i].code === data.code) {
               this.map.panTo(markers[i].getLatLng());
@@ -292,7 +309,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       }
 
       if (this.router.url === '/shp-to-bbox') {
-        //Nouvelle projection! On zoom dessus!'
+        // Nouvelle projection! On zoom dessus!'
         this.setPolygonStyle(data.code, !data.fromMap);
       }
 
@@ -302,7 +319,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.projectionsService.eventNewShp.subscribe((data) => {
       this.markerLayer.clearLayers();
       for (let i = 0; i < data.length; i++) {
-        let polygon = L.polygon(data[i].bbox);
+        const polygon = L.polygon(data[i].bbox);
         polygon.code = data[i].code;
         polygon.on('click', this.onClickPolygon, this);
         polygon.setStyle(this.featureColor.unselected);
@@ -310,17 +327,15 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
 
-    //New bbox
+    // New bbox
     this.projectionsService.eventNewBbox.subscribe((data) => {
       this.markerLayer.clearLayers();
-      if (this.projectionsService.initCoords.bboxToCoords.length == 2) {
+      if (this.projectionsService.initCoords.bboxToCoords.length === 2) {
         L.rectangle(this.projectionsService.initCoords.bboxToCoords).addTo(this.markerLayer);
       }
 
     });
-
-
-  };
+  }
 
   filterBoboxChange(e) {
     this.projectionsService.eventFilterTextChange.emit(this.projectionsService.filterText);
@@ -331,4 +346,3 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   }
 }
-

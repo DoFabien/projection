@@ -2,7 +2,7 @@ import {Http} from '@angular/http';
 import 'rxjs/add/operator/map';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-
+import 'rxjs/add/operator/map';
 
 @Injectable()
 export class GeocoderService {
@@ -16,7 +16,7 @@ export class GeocoderService {
     }
 
     getCurrentLocation() {
-        navigator.geolocation.getCurrentPosition(position => { return position; });
+        navigator.geolocation.getCurrentPosition(position =>  position );
 
     }
 
@@ -44,8 +44,7 @@ export class GeocoderService {
                         //         break;
                         // }
                     });
-            }
-            else {
+            } else {
 
                 // observer.error(GEOLOCATION_ERRORS['errors.location.unsupportedBrowser']);
             }

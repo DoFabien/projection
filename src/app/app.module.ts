@@ -1,11 +1,9 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
-import { MaterialModule } from '@angular/material';
 import { RouterModule, Routes } from '@angular/router';
-
+import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
+
 import { PointToCoordsComponent } from './point-to-coords/point-to-coords.component';
 import { CoordsToPointsComponent } from './coords-to-points/coords-to-points.component';
 import { ShpToBboxComponent } from './shp-to-bbox/shp-to-bbox.component';
@@ -13,11 +11,22 @@ import { BboxToCoordsComponent } from './bbox-to-coords/bbox-to-coords.component
 
 import { ProjectionsService } from './shared/projections.service';
 import { GeocoderService } from './shared/geocoder.service';
-// import { routing } from './app.routing';
-import 'hammerjs';
+
+import {MatButtonModule, MatCheckboxModule, MatIconModule,
+        MatInputModule,
+        MatFormFieldModule} from '@angular/material';
+
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {MatCardModule} from '@angular/material/card';
+import {MatSelectModule} from '@angular/material/select';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 import { RoundCoords } from './pipes/round_coords.pipe';
 import {OrderBy} from './pipes/order_by.pipe';
+import {FilterPipe} from './pipes/filter.pipe';
+
 
 const appRoutes: Routes = [
   { path: '', redirectTo: '/point-to-coords', pathMatch: 'full' },
@@ -31,7 +40,6 @@ const appRoutes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    AppComponent,
     PointToCoordsComponent,
     CoordsToPointsComponent,
     ShpToBboxComponent,
@@ -39,18 +47,20 @@ const appRoutes: Routes = [
 
     RoundCoords,
     OrderBy,
+    FilterPipe
   ],
   imports: [
     BrowserModule,
-    FormsModule,
+    BrowserAnimationsModule,
     HttpModule,
-     RouterModule.forRoot(appRoutes),
-    MaterialModule.forRoot()
+    MatButtonModule, MatCheckboxModule, MatIconModule, MatInputModule, MatFormFieldModule, FormsModule,
+    MatSlideToggleModule, MatCardModule, MatSelectModule, MatTooltipModule,
+    RouterModule.forRoot(appRoutes)
   ],
   providers: [
-    ProjectionsService,
-    GeocoderService
-    ],
+              ProjectionsService,
+              GeocoderService
+            ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

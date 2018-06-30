@@ -5,14 +5,14 @@
                 <th width="50px">
                 </th>
                 <th width="150px" style="max-width: 150px;" class="pointer align-left">
-                    <p md-line (click)="orderBy('code')" class="pointer"> Code
+                    <p mat-line (click)="orderBy('code')" class="pointer"> Code
                         <i *ngIf="orderby == 'code'" class="material-icons">expand_less</i>
                         <i *ngIf="orderby == '-' + 'code'" class="material-icons">expand_more</i>
                         <i *ngIf="orderby != '-' + 'code' && orderby != 'code'" class="material-icons">remove</i>
                     </p>
                 </th>
                 <th width="200px" style="max-width: 200px;" class="pointer align-left">
-                    <p md-line (click)="orderBy('name')" class="pointer"> Nom
+                    <p mat-line (click)="orderBy('name')" class="pointer"> Nom
                         <i *ngIf="orderby == 'name'" class="material-icons">expand_less</i>
                         <i *ngIf="orderby == '-' + 'name'" class="material-icons">expand_more</i>
                         <i *ngIf="orderby != '-' + 'name' && orderby != 'name'" class="material-icons">remove</i>
@@ -31,7 +31,6 @@
                 <td width="50px" style="text-align:center">
                     <i *ngIf="selectedProjection.code == p.code" class="material-icons icon-selected">radio_button_checked</i>
                     <i *ngIf="selectedProjection.code !== p.code" class="material-icons icon-unselected">radio_button_unchecked</i>
-                    <!--<md-checkbox [checked]="(selectedProjection.code == p.code)" [disabled]="true" style="margin-left: 10px"></md-checkbox>-->
                 </td>
 
                 <td width="150px" style="max-width: 150px;" [ngClass]="{'selected': selectedProjection.code == p.code }">
@@ -47,24 +46,29 @@
     </div>
 </div>
 <div id="selected_projection">
-    <md-card>
+    <mat-card>
         <div *ngIf="selectedProjection.code">
-            <b>Code :</b> <a href="{{selectedProjection.url}}" target="_blank"> {{selectedProjection.code}} </a> <b style="margin-left: 20px;">  Région :</b>            {{selectedProjection.region}}
-            <br> <b>Nom :</b> {{selectedProjection.name}}
+            <b>Code :</b> <a href="{{selectedProjection['url']}}" target="_blank"> {{selectedProjection['code']}} </a> <b style="margin-left: 20px;">  Région :</b>            {{selectedProjection['region']}}
+            <br> <b>Nom :</b> {{selectedProjection['name']}}
 
-            <select [(ngModel)]="currentFormat" (change)="formatChange($event)">
-                        <option value="wkt">WKT</option>
-                        <option value="geojson">GeoJson geom </option>
-                        <option value="xyMinMax">xyMinMax</option>
-                        <option value="yxMinMax">yxMinMax</option>
-                        <option value="overpassXML">overpassXML</option>
-                        <option value="overpassQL">overpassQL</option>
-                    </select>
+            <mat-form-field style="    display: block;">
+                    <mat-select placeholder="Format" [(ngModel)]="currentFormat" (selectionChange)="formatChange($event)">
+                      <mat-option value="wkt">WKT</mat-option>
+                      <mat-option value="geojson">GeoJson geom </mat-option> 
+                      <mat-option value="xyMinMax">xyMinMax</mat-option>
+                      <mat-option value="yxMinMax">yxMinMax</mat-option>
+                      <mat-option value="overpassXML">overpassXML</mat-option>
+                      <mat-option value="overpassQL">overpassQL</mat-option>
+                    </mat-select>
+                  </mat-form-field>
 
-            <md-input #inputTarget type="text" style="font-size: small;" placeholder="Exporter" [(ngModel)]="coordsFormatString">
+      
 
-            </md-input>
-
+            <mat-form-field style="width: 100%;">             
+                <input matInput #inputTarget type="text" 
+                    style="font-size: small;" 
+                    placeholder="Exporter" [(ngModel)]="coordsFormatString">
+            </mat-form-field>    
         </div>
 
         <div *ngIf="!selectedProjection.code">
@@ -72,5 +76,5 @@
             <i>Dessiner une emprise sur la carte puis sélectionner un système de projection</i>
         </div>
 
-    </md-card>
+    </mat-card>
 </div>

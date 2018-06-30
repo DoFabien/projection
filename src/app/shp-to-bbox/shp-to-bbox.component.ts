@@ -1,15 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ProjectionsService } from '../shared/projections.service';
 
-import { MdIconRegistry } from '@angular2-material/icon';
-import { Observable } from 'rxjs/Rx';
+import { fromEvent } from 'rxjs';
 
 
 @Component({
-    selector: 'my-shp-to-bbox',
+    selector: 'app-shp-to-bbox',
     templateUrl: './shp-to-bbox.component.html',
-    styleUrls: ['./shp-to-bbox.component.scss'],
-    viewProviders: [MdIconRegistry]
+    styleUrls: ['./shp-to-bbox.component.scss']
 })
 export class ShpToBboxComponent implements OnInit, OnDestroy {
 
@@ -21,6 +19,7 @@ export class ShpToBboxComponent implements OnInit, OnDestroy {
     subscriptionNewData;
     subscriptionProjectionCodeChange;
     subscriptionNewFilter;
+    orderby;
 
     constructor(public projectionsService: ProjectionsService) {
         /* SUBSCRIPTION */
@@ -43,31 +42,36 @@ export class ShpToBboxComponent implements OnInit, OnDestroy {
 
         this.subscriptionNewFilter = projectionsService.eventFilterTextChange.subscribe((data) => {
             this.data = projectionsService.getFilterProjection();
-            if (projectionsService.initCoords.shpParams.coords){
+            if (projectionsService.initCoords.shpParams.coords) {
                 projectionsService.setCoordsShp(projectionsService.initCoords.shpParams.coords, ''); }
         });
 
-     
 
-        let fileloaded = Observable.fromEvent(this.reader, 'loadend');
+
+        const fileloaded = fromEvent(this.reader, 'loadend');
 
         fileloaded.subscribe((data: ProgressEvent) => {
-            let target: any = data.target;
-            let dataview = new DataView(target.result, 0, 80);
-            let file_code = dataview.getInt32(0);
-            let file_length = dataview.getInt32(24);
-            let file_type = dataview.getInt32(32, true);
-            let x_min = dataview.getFloat64(36, true);
-            let x_max = dataview.getFloat64(52, true);
-            let y_min = dataview.getFloat64(44, true);
-            let y_max = dataview.getFloat64(60, true);
-            let shpParamsCoords = [{ lng: x_min, lat: y_min }, { lng: x_min, lat: y_max }, { lng: x_max, lat: y_max }, { lng: x_max, lat: y_min }];
+            const target: any = data.target;
+            const dataview = new DataView(target.result, 0, 80);
+            // const file_code = dataview.getInt32(0);
+            // const file_length = dataview.getInt32(24);
+            // const file_type = dataview.getInt32(32, true);
+            const x_min = dataview.getFloat64(36, true);
+            const x_max = dataview.getFloat64(52, true);
+            const y_min = dataview.getFloat64(44, true);
+            const y_max = dataview.getFloat64(60, true);
+
+            const shpParamsCoords = [{ lng: x_min, lat: y_min },
+                                    { lng: x_min, lat: y_max },
+                                    { lng: x_max, lat: y_max },
+                                    { lng: x_max, lat: y_min }];
+
             this.projectionsService.setCoordsShp(shpParamsCoords, '');
         });
     }
 
     onChange = function (e) {
-        let shpFile = e.target.files[0];
+      const shpFile = e.target.files[0];
         this.shpParams = {};
         this.shpParams.fileName = shpFile.name;
         this.reader.readAsArrayBuffer(shpFile);
@@ -77,9 +81,6 @@ export class ShpToBboxComponent implements OnInit, OnDestroy {
         this.orderby = (this.orderby === field) ? '-' + field : field;
     };
 
-    submitNewCoords(latlng) {
-
-    };
 
     scrollToSelectedProjection = function (code) {
         if (document.getElementById(code)) {
