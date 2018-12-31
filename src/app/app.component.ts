@@ -182,14 +182,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.geocoderService.getCoordsByAdress(text)
       .subscribe(res => {
 
-        if (res.status === 'OK') {
-          const coordsGeocoder = res.results[0].geometry.location;
-          this.map.panTo(coordsGeocoder);
+          this.map.panTo(res);
           if (this.map.getZoom() < 13) {
             this.map.setZoom(13);
           }
-
-        }
       }
       );
   };
