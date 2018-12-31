@@ -236,7 +236,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
 
-    const CLE_IGN = '7w0sxl9imubregycnsqerliz';
+    const CLE_IGN = 'choisirgeoportail';
 
     // tslint:disable-next-line:max-line-length
     const url_ign_scan = 'https://gpp3-wxs.ign.fr/' + CLE_IGN + '/wmts?LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS&EXCEPTIONS=text/xml&FORMAT=image/jpeg&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}';
