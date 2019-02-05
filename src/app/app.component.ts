@@ -182,14 +182,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.geocoderService.getCoordsByAdress(text)
       .subscribe(res => {
 
-        if (res.status === 'OK') {
-          const coordsGeocoder = res.results[0].geometry.location;
-          this.map.panTo(coordsGeocoder);
+          this.map.panTo(res);
           if (this.map.getZoom() < 13) {
             this.map.setZoom(13);
           }
-
-        }
       }
       );
   };
@@ -236,7 +232,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
 
-    const CLE_IGN = '7w0sxl9imubregycnsqerliz';
+    const CLE_IGN = 'choisirgeoportail';
 
     // tslint:disable-next-line:max-line-length
     const url_ign_scan = 'https://gpp3-wxs.ign.fr/' + CLE_IGN + '/wmts?LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS&EXCEPTIONS=text/xml&FORMAT=image/jpeg&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}';

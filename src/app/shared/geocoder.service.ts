@@ -11,8 +11,10 @@ export class GeocoderService {
     }
 
     getCoordsByAdress(text: string) {
-        return this._http.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + text)
-            .map(res => res.json());
+        return this._http.get(`https://api-adresse.data.gouv.fr/search/?q=${text}&limit=1`)
+            .map(res => {
+                return res.json().features[0].geometry.coordinates.reverse();
+            });
     }
 
     getCurrentLocation() {

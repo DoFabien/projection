@@ -55,7 +55,7 @@ const appRoutes: Routes = [
     HttpModule,
     MatButtonModule, MatCheckboxModule, MatIconModule, MatInputModule, MatFormFieldModule, FormsModule,
     MatSlideToggleModule, MatCardModule, MatSelectModule, MatTooltipModule,
-    RouterModule.forRoot(appRoutes)
+    RouterModule.forRoot(appRoutes, { useHash: true })
   ],
   providers: [
               ProjectionsService,
