@@ -232,14 +232,14 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
 
-    const CLE_IGN = 'choisirgeoportail';
+    const CLE_IGN = '7w0sxl9imubregycnsqerliz';
 
     // tslint:disable-next-line:max-line-length
-    const url_ign_scan = 'https://gpp3-wxs.ign.fr/' + CLE_IGN + '/wmts?LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS&EXCEPTIONS=text/xml&FORMAT=image/jpeg&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}';
+    const url_ign_scan = `https://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=GEOGRAPHICALGRIDSYSTEMS.MAPS&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}`;
     // tslint:disable-next-line:max-line-length
-    const url_ign_parcelaire = 'https://gpp3-wxs.ign.fr/' + CLE_IGN + '/wmts?LAYER=CADASTRALPARCELS.PARCELS&EXCEPTIONS=text/xml&FORMAT=image/png&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}';
+    const url_ign_parcelaire = `https://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=CADASTRALPARCELS.PARCELS&style=bdparcellaire&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}`;
     // tslint:disable-next-line:max-line-length
-    const url_ign_ortho = 'https://gpp3-wxs.ign.fr/' + CLE_IGN + '/wmts?LAYER=ORTHOIMAGERY.ORTHOPHOTOS&EXCEPTIONS=text/xml&FORMAT=image/jpeg&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}';
+    const url_ign_ortho = `https://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=ORTHOIMAGERY.ORTHOPHOTOS&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}`;
 
     const base_osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     { attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' });
