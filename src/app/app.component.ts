@@ -1,31 +1,36 @@
-// import { Component } from '@angular/core';
 
-// @Component({
-//   selector: 'app-root',
-//   templateUrl: './app.component.html',
-//   styleUrls: ['./app.component.css']
-// })
-// export class AppComponent {
-//   title = 'app';
-// }
 
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import {MatIconModule} from '@angular/material/icon';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatButtonModule} from '@angular/material/button';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field'
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 
 import { ProjectionsService } from './shared/projections.service';
 import { GeocoderService } from './shared/geocoder.service';
 
 // import { MdUniqueSelectionDispatcher } from '@angular2-material/core';
-import { ActivatedRoute, Router, NavigationStart } from '@angular/router';
-// import { MdIconRegistry } from '@angular2-material/icon';
+import { ActivatedRoute, Router, NavigationStart, RouterOutlet, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import * as L from 'leaflet';
+import "leaflet.markercluster";
+import 'leaflet-extra-markers';
+import { FormsModule } from '@angular/forms';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 
 
-declare let L: any;
+
 @Component({
-  selector: 'app-app', // <app-app></app-app>
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, RouterModule, FormsModule,
+    MatButtonModule, MatDividerModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSlideToggleModule, MatTooltipModule ],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  styleUrls: ['./app.component.scss', '../../node_modules/leaflet/dist/leaflet.css'],
   // providers: [MdUniqueSelectionDispatcher],
   // viewProviders: [MdIconRegistry]
 })
@@ -36,9 +41,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   map: any;
   markerLayer: any;
   locationLayer: any;
-  coordsBbox = [];
-  locationInit;
-  geocodeText;
+  coordsBbox: any[] = [];
+  locationInit: any;
+  geocodeText?: string;
+  projSelected?: any;
 
 
   featureColor = {
@@ -53,7 +59,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     private geocoderService: GeocoderService) {
     router.events.subscribe(e => {
       if (e instanceof NavigationStart) {
-        this.markerLayer.clearLayers();
+        this.markerLayer?.clearLayers();
       }
     });
 
@@ -61,7 +67,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // red orange-dark orange yellow blue-dark blue cyan purple violet pink green-dark green green-light black white
-  getColorIcon = function (region) {
+  getColorIcon = function (region: string) {
     switch (region) {
       case 'World': return 'blue-dark';
       case 'France': return 'cyan';
@@ -93,11 +99,15 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   };
 
-  drawMarkerFromCoords(coords_list) {
+  drawMarkerFromCoords(coords_list:any[]) {
 
     this.markerLayer.clearLayers();
-    const markers = L.markerClusterGroup({ maxClusterRadius: 30 });
+    const markers = new L.MarkerClusterGroup({ maxClusterRadius: 30 , 	
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: true,
+      zoomToBoundsOnClick: false});
     this.markerLayer.addLayer(markers);
+    
     for (let i = 0; i < coords_list.length; i++) {
       const extraMarkers = L.ExtraMarkers.icon({
         icon: 'fa-number',
@@ -108,10 +118,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
         number: coords_list[i].region.substr(0, 3)
       });
 
-      const marker = L.marker([coords_list[i].lat, coords_list[i].lng], { icon: extraMarkers });
+      const marker: any = L.marker([coords_list[i].lat, coords_list[i].lng], { icon: extraMarkers });
       marker.code = coords_list[i].code;
 
-      marker.on('click', function (e) {
+      marker.on('click', (e: any) => {
         this.projectionsService.setProjectionCodeSelected({ code: e.target.code, fromMap: true });
       }
         , this);
@@ -120,19 +130,19 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   }
 
-  onClickPolygon = function (e) {
+  onClickPolygon = (e: any) => {
     this.projectionsService.eventProjectionCodeSelect.emit({ code: e.target.code, fromMap: true });
     this.setPolygonStyle(e.target.code);
 
   };
 
-  shpCoordSelected = function (projSelected) {
+  shpCoordSelected =  (projSelected: any) => {
     this.projSelected = projSelected;
     this.setPolygonStyle(projSelected.code, true);
   };
 
-  setPolygonStyle = function (projSelectedCode, fitBounds = false) {
-    this.markerLayer.getLayers().forEach(feature => {
+  setPolygonStyle = (projSelectedCode: string, fitBounds = false) => {
+    this.markerLayer.getLayers().forEach((feature: any) => {
       if (projSelectedCode === feature.code) {
         feature.setStyle(this.featureColor.selected);
         if (fitBounds) {
@@ -145,7 +155,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
 
-  bboxToCoordsOnClickMap = function (e) {
+  bboxToCoordsOnClickMap =  (e :any) => {
     if (this.coordsBbox.length !== 1) {
       this.markerLayer.clearLayers();
       this.coordsBbox = [];
@@ -158,7 +168,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   };
 
-  bboxToCoordsOnMouseMoveMap = function (e) {
+  bboxToCoordsOnMouseMoveMap =  (e:any) => {
     if (this.router.url === '/bbox-to-coords') {
       if (this.coordsBbox.length === 1) {
         this.markerLayer.clearLayers();
@@ -168,7 +178,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   };
 
-  onClickMap(e) {
+  onClickMap(e: any) {
     if (this.router.url === '/point-to-coords') {
       this.projectionsService.getProjsectionsFromWGS84(e.latlng.lng, e.latlng.lat);
     }
@@ -178,7 +188,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
-  geocode = function (text) {
+  geocode =  (text :string | undefined) => {
+    if (!text) {
+      return;
+    }
     this.geocoderService.getCoordsByAdress(text)
       .subscribe(res => {
 
@@ -190,7 +203,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       );
   };
 
-  getLocation = function () {
+  getLocation =  () => {
 
     this.geocoderService.getLocation()
       .subscribe(location => {
@@ -205,7 +218,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
             iconUrl: './assets/location.png',
             iconSize: [24, 24],
             iconAnchor: [12, 12]
-          }), clickable: false
+          })
         }).addTo(this.locationLayer);
         this.locationInit = coordsLocation;
       });
@@ -272,7 +285,8 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getLocation();
     this.projectionsService.eventProjsectionsFromWGS84.subscribe((data) => {
       const latlng = data.coordsClick;
-      this.markerLayer.clearLayers();
+      this.markerLayer?.clearLayers();
+      // ExtraMarkers
       if (latlng.lat && latlng.lng) {
         const extraMarkers = L.ExtraMarkers.icon({
           icon: 'fa-number',
@@ -315,7 +329,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.projectionsService.eventNewShp.subscribe((data) => {
       this.markerLayer.clearLayers();
       for (let i = 0; i < data.length; i++) {
-        const polygon = L.polygon(data[i].bbox);
+        const polygon :any = L.polygon(data[i].bbox);
         polygon.code = data[i].code;
         polygon.on('click', this.onClickPolygon, this);
         polygon.setStyle(this.featureColor.unselected);
@@ -333,7 +347,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  filterBoboxChange(e) {
+  filterBoboxChange() {
     this.projectionsService.eventFilterTextChange.emit(this.projectionsService.filterText);
   }
 

@@ -1,19 +1,29 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ProjectionsService } from '../shared/projections.service';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatCardModule } from '@angular/material/card';
+import { OrderBy } from '../pipes/order_by.pipe';
+import {MatSelectModule} from '@angular/material/select';
 
 @Component({
   selector: 'app-bbox-to-coords',
   templateUrl: './bbox-to-coords.component.html',
-  styleUrls: ['./bbox-to-coords.component.scss']
+  styleUrls: ['./bbox-to-coords.component.scss'],
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule,  MatCardModule, OrderBy,MatSelectModule],
 })
 export class BboxToCoordsComponent implements OnInit, OnDestroy {
 
   data: any = [];
   reader = new FileReader();
-  selectedProjection = { code: null };
+  selectedProjection : any= { code: null };
   coordsFormatString = '';
   currentFormat = 'wkt';
-  orderby;
+  orderby: any;
   subscriptionDataLoad;
   subscriptionNewData;
   subscriptionProjectionCodeChange;
@@ -47,20 +57,19 @@ export class BboxToCoordsComponent implements OnInit, OnDestroy {
   }
 
 
-
-  orderBy = function (field) {
+  orderBy(field: string): void {
     this.orderby = (this.orderby === field) ? '-' + field : field;
-  };
+  }
 
 
-  scrollToSelectedProjection = function (code) {
+  scrollToSelectedProjection(code : string) {
     if (document.getElementById(code)) {
-      document.getElementById(code).scrollIntoView();
+      document.getElementById(code)?.scrollIntoView();
     }
   };
 
 
-  onClickProjection = function (_projection_selected) {
+  onClickProjection  (_projection_selected: any) {
     if (this.projectionsService.initCoords.shpParams.coords) {
       this.projectionsService.setProjectionCodeSelected({ code: _projection_selected.code, fromMap: false });
     } else {
@@ -69,14 +78,19 @@ export class BboxToCoordsComponent implements OnInit, OnDestroy {
   };
 
 
-  getBboxFormat = function (format) {
-    const coords = this.selectedProjection.coords;
+  getBboxFormat (format: string): string {
+    if (!this.selectedProjection?.coords){
+      return ''
+    }
+    let formatedString = '';
+
+    const coords = this.selectedProjection?.coords;
     if (this.selectedProjection.coords) {
       const x_min = coords[0][0];
       const x_max = coords[1][0];
       const y_min = coords[0][1];
       const y_max = coords[1][1];
-      let formatedString = '';
+     
       switch (format) {
         case 'wkt':
           formatedString = 'POLYGON(' + x_min + ' ' + y_min + ','
@@ -108,13 +122,15 @@ export class BboxToCoordsComponent implements OnInit, OnDestroy {
         case 'overpassQL':
           formatedString = y_min + ',' + x_min + ',' + y_max + ',' + x_max;
           break;
+        default:
+          formatedString = '';
       }
-
-      return formatedString;
     }
+    
+    return formatedString;
   };
 
-  formatChange = function (select) {
+  formatChange  (select: any) {
     this.currentFormat = select.value;
     this.coordsFormatString = this.getBboxFormat(this.currentFormat);
   };

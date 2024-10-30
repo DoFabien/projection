@@ -1,14 +1,15 @@
 <header>
-  <div class="nav">
-
     <button mat-raised-button color="primary" 
       class="toolbarElems"
       [disabled]="this.router.url == '/point-to-coords'" 
       [routerLink]="['point-to-coords']"
       matTooltip="Points -> Coordonées " tooltip-position="below">
-    <mat-icon><i class="material-icons">location_on</i></mat-icon>
-     <mat-icon><i class="material-icons">keyboard_arrow_right</i></mat-icon>
-     <div>x/y</div>
+   
+     <div style="display: flex;flex-direction: row; align-items: center;">
+      <mat-icon>location_on</mat-icon>
+      <mat-icon>keyboard_arrow_right</mat-icon>
+      <span>x/y</span>
+    </div>
     </button>
 
     <button mat-raised-button color="primary"
@@ -16,9 +17,12 @@
       [disabled]="this.router.url == '/coords-to-points'" 
       [routerLink]="['coords-to-points']"
       matTooltip="Coordonées -> Points " tooltip-position="below">
-    <div>x/y</div>
-    <mat-icon><i class="material-icons">keyboard_arrow_right</i></mat-icon>
-    <mat-icon><i class="material-icons">location_on</i></mat-icon>
+      <div style="display: flex;flex-direction: row; align-items: center;">
+        x/y
+        <mat-icon>keyboard_arrow_right</mat-icon>
+        <mat-icon>location_on</mat-icon>
+      </div>
+
     </button>
 
     <button mat-raised-button color="primary"
@@ -27,9 +31,11 @@
       [routerLink]="['shp-to-bbox']"
       matTooltip=".shp -> map (bounding box)"
       tooltip-position="below">
-    <div>.shp </div>
-     <mat-icon><i class="material-icons">keyboard_arrow_right</i></mat-icon>
-     <mat-icon><i class="material-icons">map</i></mat-icon>
+      <div style="display: flex;flex-direction: row; align-items: center;">
+        <span>.shp</span>
+        <mat-icon>keyboard_arrow_right</mat-icon>
+        <mat-icon>map</mat-icon>
+      </div>
     </button>
 
     <button mat-raised-button color="primary"
@@ -38,15 +44,17 @@
       [routerLink]="['bbox-to-coords']"
       matTooltip="Bounding box -> coordonnées" tooltip-position="below">
 
-    <div>Bbox</div>
-    <mat-icon><i class="material-icons">keyboard_arrow_right</i></mat-icon>
-    <div>x/y</div>
+      <div style="display: flex;flex-direction: row; align-items: center;">
+        <span>Bbox</span>
+        <mat-icon>keyboard_arrow_right</mat-icon>
+        <span> x/y </span>
+      </div>
     </button>
 
 
 
 
-    <form autocomplete="off" style="display: inline;" (ngSubmit)="geocode(geocodeText)">
+    <form autocomplete="off" style="display: flex;flex-direction: row;align-items: center;" (ngSubmit)="geocode(geocodeText)">
       <mat-form-field>
           <input matInput  name="Se localiser" placeholder="Rechercher un lieu" [(ngModel)]="geocodeText">
           <mat-icon matSuffix (click) = "geocodeText = ''" style = "vertical-align: bottom; cursor: pointer;" >clear</mat-icon>
@@ -55,23 +63,22 @@
       <button mat-mini-fab type="submit"
         [disabled]="!geocodeText || geocodeText == ''"
         class="toolbarElems">
-                <mat-icon class="mat-24">location_on</mat-icon>
+                <mat-icon>location_on</mat-icon>
         </button>
     </form>
 
        <button mat-mini-fab color='primary' 
           (click)="getLocation()"
           class="toolbarElems">
-                <mat-icon class="mat-24">my_location</mat-icon>
+                <mat-icon>my_location</mat-icon>
         </button>
-  </div>
 
-  <div class="filter">
+        <span class="spacer"></span>
 
     <form id="filterForm" (ngSubmit)="this.projectionsService.setFilterText(filterText)"
-        autocomplete="off" style="display: inline;">
+        autocomplete="off" style="    display: flex;flex-direction: row; align-items: center;margin-right: 2em;">
         <mat-form-field>
-            <input matInput  name="filter" ngModel #filter [(ngModel)]="filterText" placeholder="Filtrer par nom ou SRID">
+            <input matInput  name="filter"  #filter [(ngModel)]="filterText" placeholder="Filtrer par nom ou SRID">
             <mat-icon matSuffix (click)="this.projectionsService.setFilterText(''); filterText=''; " style = "vertical-align: bottom; cursor: pointer;" >clear</mat-icon>
           </mat-form-field>
 
@@ -86,15 +93,15 @@
 
 
 
-    <mat-slide-toggle [(ngModel)]="projectionsService.filterBbox" (change)='filterBoboxChange($event)' 
-      style="float: left; height: 64px;" 
-      matTooltip="Exclure les systèmes de coordonnées par zone de couverture"
-      tooltip-position="below">
+    <mat-slide-toggle 
+    style="padding-right: 2em;"
+    [checked]="projectionsService.filterBbox" 
+    (change)='filterBoboxChange()'
+    name="filterBboxToggle"
+    matTooltip="Exclure les systèmes de coordonnées par zone de couverture"
+    tooltip-position="below">
       Filter par Bbox
-    </mat-slide-toggle>
-
-
-  </div>
+  </mat-slide-toggle>
 
 
 </header>

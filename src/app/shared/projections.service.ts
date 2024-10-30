@@ -1,15 +1,18 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, EventEmitter } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { bboxPolygon, booleanPointInPolygon, point } from '@turf/turf';
+import proj4 from 'proj4';
 
-declare var proj4: any;
-declare var turf: any;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+     
+  })
 export class ProjectionsService {
-    private proj4: any;
 
-    projections = [];
-    projectionCodeSelected: string = null;
+
+    projections:any[] = [];
+    projectionCodeSelected?: string ;
     filterText = '';
     filterBbox = true;
 
@@ -23,7 +26,7 @@ export class ProjectionsService {
     eventNewBbox = new EventEmitter();
 
 
-    initCoords = {
+    initCoords : any = {
         coordsToPoints: { lng: null, lat: null },
         pointToCoords: { lng: null, lat: null },
         shpParams: { fileName: '', coords: null },
@@ -33,23 +36,27 @@ export class ProjectionsService {
 
     data = [];
 
-    constructor(private http: Http) {
-        this.proj4 = proj4;
+    constructor(private http: HttpClient) {
+        
     }
 
     loadProjections() {
-        this.http.get('./assets/projections.json')
-            .map((res: Response) => res.json())
+        this.http.get<any[]>('./assets/projections.json')
             .subscribe(
-            data => { this.projections = data; this.eventProjsectionsLoaded.emit(data); },
-            err => console.error(err)
+                {
+                    next: data => {
+                        this.projections = data;
+                        this.eventProjsectionsLoaded.emit(data);
+                    },
+                    error: err => console.error(err)
+                }
             );
     }
     getProjectionCodeSelected() {
         return this.projectionCodeSelected;
     }
 
-    setProjectionCodeSelected(code) {
+    setProjectionCodeSelected(code: any) {
         this.projectionCodeSelected = code;
         this.eventProjectionCodeSelect.emit(code);
     }
@@ -57,12 +64,12 @@ export class ProjectionsService {
     getFilterText() {
         return JSON.parse(JSON.stringify(this.filterText));
     }
-    setFilterText(text) {
+    setFilterText(text: string) {
         this.filterText = text;
         this.eventFilterTextChange.emit(text);
     }
 
-    getProjections() {
+    getProjections(): any[] {
         return JSON.parse(JSON.stringify(this.projections));
     }
 
@@ -83,13 +90,6 @@ export class ProjectionsService {
         return res;
     }
 
-    filterBySridBBox(unfilteredList: any[]) {
-        for (let i = 0; i < unfilteredList.length; i++) {
-          const point = turf.point([unfilteredList[i].lng, unfilteredList[i].lat]);
-          const bbox = turf.bboxPolygon(unfilteredList[i].wgs84bounds);
-        }
-
-    }
 
     getProjsectionsFromWGS84(lng: number, lat: number) {
       const proj_4326 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs';
@@ -98,9 +98,9 @@ export class ProjectionsService {
         for (let i = 0; i < list_proj_point_to_coords.length; i++) {
 
             // filter by bbox
-            const point = turf.point([lng, lat]);
-            const bbox = turf.bboxPolygon(list_proj_point_to_coords[i].wgs84bounds);
-            if (turf.inside(point, bbox) || !this.filterBbox) {
+            const _point = point([lng, lat]);
+            const _bbox = bboxPolygon(list_proj_point_to_coords[i].wgs84bounds);
+            if (booleanPointInPolygon(_point, _bbox) || !this.filterBbox) {
               const coords_from_proj = proj4(proj_4326, list_proj_point_to_coords[i].proj4, [lng, lat]);
                 list_proj_point_to_coords[i].lng = coords_from_proj[0];
                 list_proj_point_to_coords[i].lat = coords_from_proj[1];
@@ -109,9 +109,11 @@ export class ProjectionsService {
         }
         this.initCoords.pointToCoords = { lng: lng, lat: lat };
         this.eventProjsectionsFromWGS84.emit({ coordsClick: { lng: lng, lat: lat }, result: filteredData });
+    
     }
 
     getProjectionsToWGS84(lng: number, lat: number) {
+        console.log(lng, lat)
 
       const proj_4326 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs';
       const list_proj_point_to_coords = this.getFilterProjection();
@@ -121,10 +123,10 @@ export class ProjectionsService {
             list_proj_point_to_coords[i].lng = coords_from_proj[0];
             list_proj_point_to_coords[i].lat = coords_from_proj[1];
 
-            const point = turf.point([coords_from_proj[0], coords_from_proj[1]]);
-            const bbox = turf.bboxPolygon(list_proj_point_to_coords[i].wgs84bounds);
+            const _point = point([coords_from_proj[0], coords_from_proj[1]]);
+            const bbox = bboxPolygon(list_proj_point_to_coords[i].wgs84bounds);
 
-            if (turf.inside(point, bbox) || !this.filterBbox) {
+            if (booleanPointInPolygon(_point, bbox) || !this.filterBbox) {
                 filteredData.push(list_proj_point_to_coords[i]);
             }
         }
@@ -132,7 +134,7 @@ export class ProjectionsService {
         this.eventProjsectionsToWGS84.emit({ coordsClick: { lng: lng, lat: lat }, result: filteredData });
     }
 
-    setCoordsShp(coords, name) {
+    setCoordsShp(coords: any, name: string) {
         this.initCoords.shpParams = { coords: coords, fileName: name };
         this.updateProjectionFromShp();
     }
@@ -156,10 +158,10 @@ export class ProjectionsService {
             ];
             let inBboxProj = true;
             if (this.filterBbox) {
-              const bboxProj = turf.bboxPolygon(list_proj_point_to_coords[i].wgs84bounds);
+              const bboxProj = bboxPolygon(list_proj_point_to_coords[i].wgs84bounds);
                 for (let j = 0; j < list_proj_point_to_coords[i].bbox.length; j++) {
-                  const point = turf.point([list_proj_point_to_coords[i].bbox[j].lng, list_proj_point_to_coords[i].bbox[j].lat]);
-                    if (!turf.inside(point, bboxProj)) {
+                  const _point = point([list_proj_point_to_coords[i].bbox[j].lng, list_proj_point_to_coords[i].bbox[j].lat]);
+                    if (booleanPointInPolygon(_point, bboxProj)) {
                         inBboxProj = false;
                         break;
                     }
@@ -172,7 +174,7 @@ export class ProjectionsService {
         this.eventNewShp.emit(filteredData);
     }
 
-    setCoordsFromBbox(coords) {
+    setCoordsFromBbox(coords :any) {
         this.initCoords.bboxToCoords = coords;
         const filteredData = [];
         const proj_4326 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs';
@@ -180,12 +182,12 @@ export class ProjectionsService {
 
 
         if (coords[0] && coords[1]) {
-          const point1 = turf.point([coords[0].lng, coords[0].lat]);
-          const point2 = turf.point([coords[1].lng, coords[1].lat]);
+          const point1 = point([coords[0].lng, coords[0].lat]);
+          const point2 = point([coords[1].lng, coords[1].lat]);
 
             for (let i = 0; i < result.length; i++) {
-              const bbox = turf.bboxPolygon(result[i].wgs84bounds);
-                if (!this.filterBbox || (turf.inside(point1, bbox) && turf.inside(point2, bbox)) ) {
+              const bbox = bboxPolygon(result[i].wgs84bounds);
+                if (!this.filterBbox || (booleanPointInPolygon(point1, bbox) && booleanPointInPolygon(point2, bbox)) ) {
                   const coords1 = proj4(proj_4326, result[i].proj4, [coords[0].lng, coords[0].lat]);
                   const coords2 = proj4(proj_4326, result[i].proj4, [coords[1].lng, coords[1].lat]);
                   const x_min: number = (coords1[0] < coords2[0]) ? coords1[0] : coords2[0];
@@ -201,16 +203,19 @@ export class ProjectionsService {
         this.eventNewBbox.emit(filteredData);
     }
 
-    getProjectionByCode(code, projections) {
+    getProjectionByCode(code: string | undefined, projections: any[]): any {
         for (let i = 0; i < projections.length; i++) {
             if (projections[i].code === code) {
                 return projections[i];
             }
         }
-        return null;
+        return undefined;
     }
 
-    projIsPresent(code, projections) {
+    projIsPresent(code: string | undefined, projections: any[]) {
+        if (!code) {
+            return false;
+        }
         for (let i = 0; i < projections.length; i++) {
             if (projections[i].code === code) {
                 return true;

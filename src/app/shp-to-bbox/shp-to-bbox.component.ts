@@ -2,10 +2,18 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ProjectionsService } from '../shared/projections.service';
 
 import { fromEvent } from 'rxjs';
-
+import { CommonModule } from '@angular/common';
+import { RouterModule, RouterOutlet } from '@angular/router';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
+import {MatCardModule} from '@angular/material/card';
+import { OrderBy } from '../pipes/order_by.pipe';
 
 @Component({
     selector: 'app-shp-to-bbox',
+    standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule, MatCardModule, OrderBy],
     templateUrl: './shp-to-bbox.component.html',
     styleUrls: ['./shp-to-bbox.component.scss']
 })
@@ -13,13 +21,15 @@ export class ShpToBboxComponent implements OnInit, OnDestroy {
 
     data: any = [];
     reader = new FileReader();
-    selectedProjection = { code: null };
+    selectedProjection : any = { code: null };
 
     subscriptionDataLoad;
     subscriptionNewData;
     subscriptionProjectionCodeChange;
     subscriptionNewFilter;
-    orderby;
+    orderby: any;
+    shpParams: any;
+
 
     constructor(public projectionsService: ProjectionsService) {
         /* SUBSCRIPTION */
@@ -31,7 +41,7 @@ export class ShpToBboxComponent implements OnInit, OnDestroy {
             this.selectedProjection = projectionsService.getProjectionByCode(data.code, this.data);
             if (data.fromMap) {
                 if (document.getElementById(data.code)) {
-                    document.getElementById(data.code).scrollIntoView();
+                    document.getElementById(data.code)?.scrollIntoView();
                 }
             }
         });
@@ -50,7 +60,7 @@ export class ShpToBboxComponent implements OnInit, OnDestroy {
 
         const fileloaded = fromEvent(this.reader, 'loadend');
 
-        fileloaded.subscribe((data: ProgressEvent) => {
+        fileloaded.subscribe((data: any) => {
             const target: any = data.target;
             const dataview = new DataView(target.result, 0, 80);
             // const file_code = dataview.getInt32(0);
@@ -70,28 +80,28 @@ export class ShpToBboxComponent implements OnInit, OnDestroy {
         });
     }
 
-    onChange = function (e) {
+    onChange =  (e: any) => {
       const shpFile = e.target.files[0];
         this.shpParams = {};
         this.shpParams.fileName = shpFile.name;
         this.reader.readAsArrayBuffer(shpFile);
     };
 
-    orderBy = function (field) {
+    orderBy = (field: string) => {
         this.orderby = (this.orderby === field) ? '-' + field : field;
     };
 
 
-    scrollToSelectedProjection = function (code) {
+    scrollToSelectedProjection =  (code : string) => {
         if (document.getElementById(code)) {
-            document.getElementById(code).scrollIntoView();
+            document.getElementById(code)?.scrollIntoView();
         }
     };
 
 
 
 
-    onClickProjection = function (_projection_selected) {
+    onClickProjection =  (_projection_selected :any) => {
         if (this.projectionsService.initCoords.shpParams.coords) {
             this.projectionsService.setProjectionCodeSelected({ code: _projection_selected.code, fromMap: false });
         } else {
