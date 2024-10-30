@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ProjectionsService } from '../shared/projections.service';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -33,7 +33,7 @@ export class PointToCoordsComponent implements OnInit, OnDestroy {
   subscriptionNewSelect?: Subscription;
   subscriptionDataLoaded?: Subscription;
 
-  constructor(public projectionsService: ProjectionsService) {
+  constructor(public projectionsService: ProjectionsService, private cd: ChangeDetectorRef) {
 
   }
 
@@ -50,7 +50,7 @@ export class PointToCoordsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // nouvelles data!
     this.subscriptionNewData = this.projectionsService.eventProjsectionsFromWGS84.subscribe((data) => {
-      this.data = data.result;
+      this.data = [...data.result];
       const projIsPresent = this.projectionsService.projIsPresent(this.selectedProjection.code, data.result);
 
       if (projIsPresent) {
@@ -58,16 +58,17 @@ export class PointToCoordsComponent implements OnInit, OnDestroy {
       } else {
         this.selectedProjection = { code: undefined };
       }
+      this.cd.detectChanges();
     });
 
     // chargements
     this.subscriptionDataLoaded = this.projectionsService.eventProjsectionsLoaded.subscribe((data) => {
-      this.data = data;
+      this.data = [...data];
     });
 
     // le filtre a changé
     this.subscriptionNewFilter = this.projectionsService.eventFilterTextChange.subscribe((data) => {
-      this.data = this.projectionsService.getFilterProjection();
+      this.data = [...this.projectionsService.getFilterProjection()];
       this.projectionsService.getProjsectionsFromWGS84(this.projectionsService.initCoords.pointToCoords.lng,
         this.projectionsService.initCoords.pointToCoords.lat);
     });
