@@ -27,4 +27,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist/browser --project-name=projection --branch=main
+          command: pages deploy dist/projection --project-name=projection --branch=main
