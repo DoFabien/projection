@@ -107,7 +107,11 @@
 </header>
 <main>
   <div id="containerMap">
-    <div id="map" [ngClass]="{'pointer':  (this.router.url === '/point-to-coords' || this.router.url === '/bbox-to-coords') }"></div>
+    <div leaflet id="map"
+      [leafletOptions]="options"
+      (leafletMapReady)="onMapReady($event)"
+      [ngClass]="{'pointer': (this.router.url === '/point-to-coords' || this.router.url === '/bbox-to-coords')}">
+    </div>
   </div>
 
 

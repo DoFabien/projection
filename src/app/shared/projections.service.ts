@@ -113,8 +113,6 @@ export class ProjectionsService {
     }
 
     getProjectionsToWGS84(lng: number, lat: number) {
-        console.log(lng, lat)
-
       const proj_4326 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs';
       const list_proj_point_to_coords = this.getFilterProjection();
       const filteredData = [];

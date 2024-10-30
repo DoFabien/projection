@@ -15,7 +15,9 @@ import { GeocoderService } from './shared/geocoder.service';
 // import { MdUniqueSelectionDispatcher } from '@angular2-material/core';
 import { ActivatedRoute, Router, NavigationStart, RouterOutlet, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import * as L from 'leaflet';
+
 import "leaflet.markercluster";
 import 'leaflet-extra-markers';
 import { FormsModule } from '@angular/forms';
@@ -28,7 +30,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterOutlet, RouterModule, FormsModule,
-    MatButtonModule, MatDividerModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSlideToggleModule, MatTooltipModule ],
+    MatButtonModule, MatDividerModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSlideToggleModule, MatTooltipModule, LeafletModule  ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss', '../../node_modules/leaflet/dist/leaflet.css'],
   // providers: [MdUniqueSelectionDispatcher],
@@ -36,6 +38,15 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 })
 
 export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
+
+  options = {
+    layers: [
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+    ],
+    zoom: 6,
+    center: L.latLng(48, 5)
+  };
+
   // subscription: Subscription;
   filterText = '';
   map: any;
@@ -63,6 +74,125 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
 
+  }
+
+  onMapReady(map: L.Map) {
+    this.map = map;
+    this.markerLayer = L.featureGroup().addTo(map);
+    this.locationLayer = L.featureGroup().addTo(map);
+    if (this.locationInit) {
+      this.map = this.map.setView(this.locationInit, 13);
+    } else {
+      this.map = this.map.setView([48, 5], 6);
+    }
+
+    this.markerLayer = L.featureGroup();
+    this.markerLayer.addTo(this.map);
+    this.locationLayer = L.featureGroup();
+    this.locationLayer.addTo(this.map);
+
+
+
+    const CLE_IGN = '7w0sxl9imubregycnsqerliz';
+
+    // tslint:disable-next-line:max-line-length
+    const url_ign_scan = `https://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=GEOGRAPHICALGRIDSYSTEMS.MAPS&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}`;
+    // tslint:disable-next-line:max-line-length
+    const url_ign_parcelaire = `https://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=CADASTRALPARCELS.PARCELS&style=bdparcellaire&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}`;
+    // tslint:disable-next-line:max-line-length
+    const url_ign_ortho = `https://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=ORTHOIMAGERY.ORTHOPHOTOS&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}`;
+
+    const base_osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' });
+    const base_mapbox = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', { id: 'fabiendelolmo.h5p49m4f' });
+    const base_ign_scan = L.tileLayer(url_ign_scan, { attribution: '&copy; <a href="http://www.ign.fr/">IGN</a>' });
+    const base_ign_ortho = L.tileLayer(url_ign_ortho, { attribution: '&copy; <a href="http://www.ign.fr/">IGN</a>' });
+    const base_ign_parcelaire = L.tileLayer(url_ign_parcelaire, { attribution: '&copy; <a href="http://www.ign.fr/">IGN</a>' });
+
+    base_osm.addTo(this.map);
+
+    const baseMaps = {
+      'OSM': base_osm,
+      'Mapbox OSM': base_mapbox,
+      'Scan IGN': base_ign_scan,
+      'Ortho IGN': base_ign_ortho,
+      'Parcelaire IGN': base_ign_parcelaire
+    };
+
+    L.control.layers(baseMaps).addTo(this.map);
+
+    this.map.on('click', this.onClickMap, this);
+    this.map.on('mousemove', this.bboxToCoordsOnMouseMoveMap, this);
+
+    this.projectionsService.eventProjsectionsToWGS84.subscribe((projs) => {
+      if (this.router.url === '/coords-to-points') {
+        this.drawMarkerFromCoords(projs.result);
+      }
+    });
+
+    this.getLocation();
+    this.projectionsService.eventProjsectionsFromWGS84.subscribe((data) => {
+      const latlng = data.coordsClick;
+      this.markerLayer?.clearLayers();
+      // ExtraMarkers
+      if (latlng.lat && latlng.lng) {
+        const extraMarkers = window['L'].ExtraMarkers.icon({
+          icon: 'fa-number',
+          iconColor: 'black',
+          markerColor: 'white',
+          shape: 'circle',
+          prefix: 'fa',
+          number: '?'
+        });
+        const marker = L.marker(latlng, { icon: extraMarkers });
+        marker.addTo(this.markerLayer);
+      }
+    });
+
+
+    /*Une nouvelle projection est selectionné  */
+    this.projectionsService.eventProjectionCodeSelect.subscribe((data) => {
+      if (this.router.url === '/coords-to-points') {
+        if (!data.fromMap) { // provient des données, on centre la map sur le marker
+          const markers = this.markerLayer.getLayers()[0].getLayers();
+          for (let i = 0; i < markers.length; i++) {
+            if (markers[i].code === data.code) {
+              this.map.panTo(markers[i].getLatLng());
+              return;
+            }
+          }
+        } else if (data.fromMap) {
+
+        }
+      }
+
+      if (this.router.url === '/shp-to-bbox') {
+        // Nouvelle projection! On zoom dessus!'
+        this.setPolygonStyle(data.code, !data.fromMap);
+      }
+
+    });
+
+    // SHP les données ont changées
+    this.projectionsService.eventNewShp.subscribe((data) => {
+      this.markerLayer.clearLayers();
+      for (let i = 0; i < data.length; i++) {
+        const polygon :any = L.polygon(data[i].bbox);
+        polygon.code = data[i].code;
+        polygon.on('click', this.onClickPolygon, this);
+        polygon.setStyle(this.featureColor.unselected);
+        polygon.addTo(this.markerLayer);
+      }
+    });
+
+    // New bbox
+    this.projectionsService.eventNewBbox.subscribe((data) => {
+      this.markerLayer.clearLayers();
+      if (this.projectionsService.initCoords.bboxToCoords.length === 2) {
+        L.rectangle(this.projectionsService.initCoords.bboxToCoords).addTo(this.markerLayer);
+      }
+
+    });
   }
 
   // red orange-dark orange yellow blue-dark blue cyan purple violet pink green-dark green green-light black white
@@ -101,14 +231,14 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   drawMarkerFromCoords(coords_list:any[]) {
 
     this.markerLayer.clearLayers();
-    const markers = new L.MarkerClusterGroup({ maxClusterRadius: 30 , 	
+    const markers = new window['L'].MarkerClusterGroup({ maxClusterRadius: 30 , 	
       spiderfyOnMaxZoom: true,
       showCoverageOnHover: true,
-      zoomToBoundsOnClick: false});
+      zoomToBoundsOnClick: true});
     this.markerLayer.addLayer(markers);
     
     for (let i = 0; i < coords_list.length; i++) {
-      const extraMarkers = L.ExtraMarkers.icon({
+      const extraMarkers = window['L'].ExtraMarkers.icon({
         icon: 'fa-number',
         iconColor: 'white',
         markerColor: this.getColorIcon(coords_list[i].region),
@@ -231,119 +361,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit() {
     const that = this;
-    if (this.locationInit) {
-      this.map = L.map('map').setView(this.locationInit, 13);
-    } else {
-      this.map = L.map('map').setView([48, 5], 6);
-    }
 
-    this.markerLayer = L.featureGroup();
-    this.markerLayer.addTo(this.map);
-    this.locationLayer = L.featureGroup();
-    this.locationLayer.addTo(this.map);
-
-
-
-    const CLE_IGN = '7w0sxl9imubregycnsqerliz';
-
-    // tslint:disable-next-line:max-line-length
-    const url_ign_scan = `https://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=GEOGRAPHICALGRIDSYSTEMS.MAPS&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}`;
-    // tslint:disable-next-line:max-line-length
-    const url_ign_parcelaire = `https://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=CADASTRALPARCELS.PARCELS&style=bdparcellaire&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}`;
-    // tslint:disable-next-line:max-line-length
-    const url_ign_ortho = `https://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=ORTHOIMAGERY.ORTHOPHOTOS&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}`;
-
-    const base_osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    { attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' });
-    const base_mapbox = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', { id: 'fabiendelolmo.h5p49m4f' });
-    const base_ign_scan = L.tileLayer(url_ign_scan, { attribution: '&copy; <a href="http://www.ign.fr/">IGN</a>' });
-    const base_ign_ortho = L.tileLayer(url_ign_ortho, { attribution: '&copy; <a href="http://www.ign.fr/">IGN</a>' });
-    const base_ign_parcelaire = L.tileLayer(url_ign_parcelaire, { attribution: '&copy; <a href="http://www.ign.fr/">IGN</a>' });
-
-    base_osm.addTo(this.map);
-
-    const baseMaps = {
-      'OSM': base_osm,
-      'Mapbox OSM': base_mapbox,
-      'Scan IGN': base_ign_scan,
-      'Ortho IGN': base_ign_ortho,
-      'Parcelaire IGN': base_ign_parcelaire
-    };
-
-    L.control.layers(baseMaps).addTo(this.map);
-
-    this.map.on('click', this.onClickMap, this);
-    this.map.on('mousemove', this.bboxToCoordsOnMouseMoveMap, this);
-
-    this.projectionsService.eventProjsectionsToWGS84.subscribe((projs) => {
-      if (this.router.url === '/coords-to-points') {
-        this.drawMarkerFromCoords(projs.result);
-      }
-    });
-
-    this.getLocation();
-    this.projectionsService.eventProjsectionsFromWGS84.subscribe((data) => {
-      const latlng = data.coordsClick;
-      this.markerLayer?.clearLayers();
-      // ExtraMarkers
-      if (latlng.lat && latlng.lng) {
-        const extraMarkers = L.ExtraMarkers.icon({
-          icon: 'fa-number',
-          iconColor: 'black',
-          markerColor: 'white',
-          shape: 'circle',
-          prefix: 'fa',
-          number: '?'
-        });
-        const marker = L.marker(latlng, { icon: extraMarkers });
-        marker.addTo(this.markerLayer);
-      }
-    });
-
-
-    /*Une nouvelle projection est selectionné  */
-    this.projectionsService.eventProjectionCodeSelect.subscribe((data) => {
-      if (this.router.url === '/coords-to-points') {
-        if (!data.fromMap) { // provient des données, on centre la map sur le marker
-          const markers = this.markerLayer.getLayers()[0].getLayers();
-          for (let i = 0; i < markers.length; i++) {
-            if (markers[i].code === data.code) {
-              this.map.panTo(markers[i].getLatLng());
-              return;
-            }
-          }
-        } else if (data.fromMap) {
-
-        }
-      }
-
-      if (this.router.url === '/shp-to-bbox') {
-        // Nouvelle projection! On zoom dessus!'
-        this.setPolygonStyle(data.code, !data.fromMap);
-      }
-
-    });
-
-    // SHP les données ont changées
-    this.projectionsService.eventNewShp.subscribe((data) => {
-      this.markerLayer.clearLayers();
-      for (let i = 0; i < data.length; i++) {
-        const polygon :any = L.polygon(data[i].bbox);
-        polygon.code = data[i].code;
-        polygon.on('click', this.onClickPolygon, this);
-        polygon.setStyle(this.featureColor.unselected);
-        polygon.addTo(this.markerLayer);
-      }
-    });
-
-    // New bbox
-    this.projectionsService.eventNewBbox.subscribe((data) => {
-      this.markerLayer.clearLayers();
-      if (this.projectionsService.initCoords.bboxToCoords.length === 2) {
-        L.rectangle(this.projectionsService.initCoords.bboxToCoords).addTo(this.markerLayer);
-      }
-
-    });
   }
 
   filterBoboxChange() {
