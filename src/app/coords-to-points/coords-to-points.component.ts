@@ -75,7 +75,6 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
 
 
   submitNewCoords(latlng: number[]) {
-    console.log(latlng)
     let lng = Number(latlng[0])
     let lat = Number(latlng[1])
     
