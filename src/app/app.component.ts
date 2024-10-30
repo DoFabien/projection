@@ -54,7 +54,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   constructor(public projectionsService: ProjectionsService,
-    private route: ActivatedRoute,
     public router: Router,
     private geocoderService: GeocoderService) {
     router.events.subscribe(e => {
