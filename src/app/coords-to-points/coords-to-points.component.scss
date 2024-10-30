@@ -1,9 +1,6 @@
 $footerHeigth: 120px;
 
-.formInput{
-    height: 60px;
-    padding-left: 10px;
-}
+
 .errorMessage{
     display: block;
     font-size: small;
@@ -15,9 +12,12 @@ $footerHeigth: 120px;
 }
 
 
-.formCoords tr{
-    border-bottom-style: hidden;
-    border-bottom-width: 0;
+.formCoords{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
 }
 .tableData {
     position: absolute;

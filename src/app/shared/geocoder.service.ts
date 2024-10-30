@@ -1,20 +1,24 @@
-import {Http} from '@angular/http';
-import 'rxjs/add/operator/map';
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
-import 'rxjs/add/operator/map';
+import {Observable, Observer, map, of} from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+  })
 export class GeocoderService {
-    constructor(private _http: Http) {
+    constructor(private _http: HttpClient) {
 
     }
 
     getCoordsByAdress(text: string) {
         return this._http.get(`https://api-adresse.data.gouv.fr/search/?q=${text}&limit=1`)
-            .map(res => {
-                return res.json().features[0].geometry.coordinates.reverse();
-            });
+            .pipe(
+                map((res: any) => {
+                    return res.features[0].geometry.coordinates.reverse();
+                }
+            )
+            )
+  
     }
 
     getCurrentLocation() {
@@ -24,7 +28,7 @@ export class GeocoderService {
 
      getLocation(): Observable<any> {
 
-        return Observable.create(observer => {
+        return new Observable((observer: Observer<any>) => {
 
             if (window.navigator && window.navigator.geolocation) {
                 window.navigator.geolocation.getCurrentPosition(

@@ -1,20 +1,34 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ProjectionsService } from '../shared/projections.service';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatCardModule } from '@angular/material/card';
+import { OrderBy } from '../pipes/order_by.pipe';
+import { MatIconModule } from '@angular/material/icon';
+import { RoundCoords } from '../pipes/round_coords.pipe';
+import { MatButtonModule } from '@angular/material/button';
 
 
 @Component({
   selector: 'app-coords-to-points',
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule,  MatCardModule, OrderBy,
+        MatIconModule, RoundCoords, MatButtonModule
+      ],
   templateUrl: './coords-to-points.component.html',
   styleUrls: ['./coords-to-points.component.scss']
 })
 export class CoordsToPointsComponent implements OnInit, OnDestroy {
 
-  inputCoords = { lat: null, lng: null };
+  inputCoords: any = { lat: null, lng: null };
   lngIsValid = false;
   latIsValid = false;
-  selectedProjection = { code: null };
+  selectedProjection : {code : string | undefined, url?: any, region? : string, name?: string, lat?: number, lng?: number} = { code: undefined };
   data: any = [];
-  orderby;
+  orderby: any;
 
 
   subscriptionDataLoad;
@@ -39,7 +53,7 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
       this.data = this.projectionsService.getFilterProjection();
       // si la projection selectionné n'est plus dans les datas
       if (!this.projectionsService.projIsPresent(this.selectedProjection.code, data)) {
-        this.selectedProjection = { code: null };
+        this.selectedProjection = { code: undefined };
       }
       if (this.projectionsService.initCoords.coordsToPoints.lng && this.projectionsService.initCoords.coordsToPoints.lat) {
         this.projectionsService.getProjectionsToWGS84(this.projectionsService.initCoords.coordsToPoints.lng,
@@ -52,7 +66,7 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
       this.selectedProjection = this.projectionsService.getProjectionByCode(data.code, this.data);
       if (data.fromMap) {
         if (document.getElementById(data.code)) {
-          document.getElementById(data.code).scrollIntoView();
+          document.getElementById(data.code)?.scrollIntoView();
         }
       }
     });
@@ -60,23 +74,29 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
   }
 
 
-  submitNewCoords(latlng) {
-    if (latlng[0] && latlng[1]) {
-      this.projectionsService.getProjectionsToWGS84(latlng[0], latlng[1]);
+  submitNewCoords(latlng: number[]) {
+    console.log(latlng)
+    let lng = Number(latlng[0])
+    let lat = Number(latlng[1])
+    
+    if (latlng[0] && latlng[1] && 
+        Number.isFinite(lng) && 
+        Number.isFinite(lat)) {
+      this.projectionsService.getProjectionsToWGS84(lng, lat);
     }
   }
 
-  scrollToSelectedProjection = function (code) {
+  scrollToSelectedProjection = function (code: string) {
     if (document.getElementById(code)) {
-      document.getElementById(code).scrollIntoView();
+      document.getElementById(code)?.scrollIntoView();
     }
   };
 
-  orderBy = function (field) {
+  orderBy =  (field : string) => {
     this.orderby = (this.orderby === field) ? '-' + field : field;
   };
 
-  onPastLng = function (e) {
+  onPastLng =  (e: any) => {
     let data: string;
     if (e.clipboardData) {
       data = e.clipboardData.getData('text/plain').trim();
@@ -96,14 +116,14 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
     // tslint:disable-next-line:max-line-length
     if (new RegExp('(LineString|Point|Polygon|MULTIPOLYGON|MULTIPOINT|MULTILINESTRING)\\s*\\(+[0-9]+\\.?[0-9]*\\s[0-9]+\\.?[0-9]', 'i').test(data)) {
 
-      const wkt_corrds = /(-?[0-9]+\.?[0-9]*\s-?[0-9]+\.?[0-9]*)/.exec(data); // 1ere coordonnées
+      const wkt_corrds :any = /(-?[0-9]+\.?[0-9]*\s-?[0-9]+\.?[0-9]*)/.exec(data); // 1ere coordonnées
       e.preventDefault();
       this.inputCoords.lng = wkt_corrds[0].split(' ')[0].trim();
       this.inputCoords.lat = wkt_corrds[0].split(' ')[1].trim();
     }
   };
 
-  reverseLngLat = function (lng, lat, isValid) {
+  reverseLngLat =  (lng: any, lat :any, isValid: any) => {
     this.inputCoords.lng = lat.value;
     this.inputCoords.lat = lng.value;
     if (isValid[0] && isValid[1]) {
@@ -111,7 +131,7 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
     }
   };
 
-  onClickProjection = function (_projection_selected) {
+  onClickProjection = (_projection_selected :any) => {
     if (this.inputCoords.lng && this.inputCoords.lat) {
       this.projectionsService.setProjectionCodeSelected({ code: _projection_selected.code, fromMap: false });
     }

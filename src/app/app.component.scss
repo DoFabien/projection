@@ -1,90 +1,100 @@
 // styles applied on :host are applied on the current component, "app" in this case
 
 :host {
-  display: block;
-}
-$headerHeigth : 64px;
-$rightDivWidth : 500px;
-
-header {
- // background-color: ghostwhite;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: $headerHeigth;
-  box-shadow: 1px 1px 5px rgba(85, 85, 85, 0.37);
-
-}
-
-main {
-  margin-top: $headerHeigth;
-  display: block;
-}
-
-
-main{
-position:absolute;
-right: $rightDivWidth;
-left:0;
-top:0;
-bottom: 0;
-padding: 0;
-
-
-}
-#containerMap{
-
-  width:100%;
-
-  margin-top: 4px;
-  position: absolute;
+    display: block;
+  }
+  $headerHeigth : 64px;
+  $rightDivWidth : 500px;
+  
+  header {
+   // background-color: ghostwhite;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: $headerHeigth;
+    box-shadow: 1px 1px 5px rgba(85, 85, 85, 0.37);
+  
+  }
+  
+  main {
+    margin-top: $headerHeigth;
+    display: block;
+  }
+  
+  
+  main{
+  position:absolute;
+  right: $rightDivWidth;
+  left:0;
   top:0;
   bottom: 0;
-
-}
-#map {
-    height: 100%;
-}
-
-#rightDiv {
-  position: absolute;
-  top:$headerHeigth;
-  width: $rightDivWidth;
-  right: 0;
-  bottom: 0;
-
-  overflow: auto;
-}
-
-.nav{
+  padding: 0;
+  
+  
+  }
+  #containerMap{
+  
+    width:100%;
+  
+    margin-top: 4px;
     position: absolute;
-    right: 500px;
-    left: 0;
-    padding: 5px;
-}
-
-.filter{
-      width: 500px;
-    float: right;
-}
-
-.filter_bbox{
-      float: right;
-}
-
-#filterForm{
+    top:0;
+    bottom: 0;
+  
+  }
+  #map {
+      height: 100%;
+  }
+  
+  #rightDiv {
+    position: absolute;
+    top:$headerHeigth;
+    width: $rightDivWidth;
+    right: 0;
+    bottom: 0;
+  
+    overflow: auto;
+  }
+  
+  .nav{
       position: absolute;
-    right: 20px;
+      right: 500px;
+      left: 0;
+      padding: 5px;
+  }
+  
+  .filter{
+        width: 500px;
+      float: right;
+  }
+  
+  .filter_bbox{
+        float: right;
+  }
+  
+
+  .spacer {
+    flex: 1 1 auto;
 }
 
+  
+  button div {
+        display: inline;
+      vertical-align: top;
+  }
+  
+  .toolbarElems{
+    margin-left: 5px;
+    margin-right: 5px;
+  }
 
-button div {
-      display: inline;
-    vertical-align: top;
-}
-
-.toolbarElems{
-  margin-left: 5px;
-  margin-right: 5px;
-}
+  header{
+    height: $headerHeigth !important;
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  

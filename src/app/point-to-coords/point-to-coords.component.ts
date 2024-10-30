@@ -1,36 +1,50 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ProjectionsService } from '../shared/projections.service';
+import { Subscription } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatCardModule } from '@angular/material/card';
+import { OrderBy } from '../pipes/order_by.pipe';
+import { MatIconModule } from '@angular/material/icon';
+import { RoundCoords } from '../pipes/round_coords.pipe';
 
 
 
 @Component({
   selector: 'app-point-to-coords',
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule,  MatCardModule, OrderBy,
+        MatIconModule, RoundCoords
+      ],
   templateUrl: './point-to-coords.component.html',
   styleUrls: ['./point-to-coords.component.scss']
 })
 export class PointToCoordsComponent implements OnInit, OnDestroy {
 
   data: any = [];
-  selectedProjection = { code: null };
-  orderby = null;
+  selectedProjection: {code : string | undefined, url?: any, region? : string, name?: string, lat?: number, lng?: number} = { code: undefined };
+  orderby?: any ;
 
-  subscriptionNewData;
-  subscriptionNewFilter;
-  subscriptionNewSelect;
-  subscriptionDataLoaded;
+  subscriptionNewData?: Subscription;
+  subscriptionNewFilter?: Subscription;
+  subscriptionNewSelect?: Subscription;
+  subscriptionDataLoaded?: Subscription;
 
   constructor(public projectionsService: ProjectionsService) {
 
   }
 
 
-  orderBy = function (field) {
+  orderBy(field: string): void {
     this.orderby = (this.orderby === field) ? '-' + field : field;
-  };
+  }
 
-  onClickProjection = function (_projection_selected) {
+  onClickProjection(_projection_selected: { code: string }): void {
     this.projectionsService.setProjectionCodeSelected({ code: _projection_selected.code, fromMap: false });
-  };
+  }
 
 
   ngOnInit() {
@@ -42,7 +56,7 @@ export class PointToCoordsComponent implements OnInit, OnDestroy {
       if (projIsPresent) {
         this.selectedProjection = this.projectionsService.getProjectionByCode(this.selectedProjection.code, this.data);
       } else {
-        this.selectedProjection = { code: null };
+        this.selectedProjection = { code: undefined };
       }
     });
 
@@ -75,10 +89,10 @@ export class PointToCoordsComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy() {
-    this.subscriptionNewData.unsubscribe();
-    this.subscriptionNewFilter.unsubscribe();
-    this.subscriptionNewSelect.unsubscribe();
-    this.subscriptionDataLoaded.unsubscribe();
+    this.subscriptionNewData?.unsubscribe();
+    this.subscriptionNewFilter?.unsubscribe();
+    this.subscriptionNewSelect?.unsubscribe();
+    this.subscriptionDataLoaded?.unsubscribe();
 
   }
 

@@ -1,8 +1,4 @@
-<div class="formInput">
     <form class="formCoords" (ngSubmit)="submitNewCoords([inputCoords.lng,inputCoords.lat])" autocomplete="off">
-    <table>
-        <tr>
-            <td style="height:80px;">
                 <mat-form-field>
                     <input matInput placeholder="Lng (x)"
                         name="lng"
@@ -15,12 +11,9 @@
                         <mat-hint class="errorMessage" align="end"> {{(!lngModel.valid && lngModel.touched) ? 'Format invalide' :'' }} </mat-hint>
 
                 </mat-form-field>
-            </td>
-
-            <td>
+      
                 <i class="material-icons pointer" (click)="reverseLngLat(lngModel,latModel, [latModel.valid,lngModel.valid])">&#xE8D4;</i>
-            </td>
-            <td>
+
             <mat-form-field>
               <input  matInput placeholder="Lat (y)"
                     name="lat"
@@ -32,18 +25,11 @@
 
             </mat-form-field>
 
-            </td>
-            <!--                     [dividerColor]="latModel.valid ? 'primary' : 'warn'" -->
-            <!-- <mat-hint class="errorMessage" align="end"> {{(!latModel.valid && latModel.touched) ? 'Format invalide' :'' }} </mat-hint> -->
-            <td>
-                <button [disabled]="!latModel.valid || !latModel.valid" style="margin-left: 5px;" mat-mini-fab type="submit">
+                <button  mat-mini-fab [disabled]="!latModel.valid || !latModel.valid" style="margin-left: 5px;" mat-mini-fab type="submit">
                      <mat-icon class="mat-24">&#xE55F;</mat-icon>
                 </button>
-            </td>
-        </tr>
-    </table>
     </form>
-</div>
+
 
 
 <div class="tableData">

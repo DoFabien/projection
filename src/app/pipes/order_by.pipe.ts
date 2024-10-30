@@ -1,6 +1,6 @@
 import {Pipe, PipeTransform} from '@angular/core'
 
-@Pipe({name: 'myOrderBy'})
+@Pipe({name: 'myOrderBy', standalone: true,})
 
 export class OrderBy implements PipeTransform {
     transform(objOrig: any, _orderField: string) {
@@ -14,7 +14,7 @@ export class OrderBy implements PipeTransform {
                 orderType = 'DESC';
             }
 
-                     obj.sort(function(a, b) {
+                     obj.sort(function(a :any, b: any) {
                 if (orderType === 'ASC') {
                     if (a[orderField] < b[orderField]) return -1;
                     if (a[orderField] > b[orderField]) return 1;
