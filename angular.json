@@ -32,6 +32,16 @@
                 "glob": "**/*",
                 "input": "./node_modules/leaflet/dist/images/",
                 "output": "./"
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/leaflet-extra-markers/dist/img",
+                "output": "./assets/dist/img"
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/leaflet-extra-markers/dist/css",
+                "output": "./assets/dist/css"
               }
             ],
             "styles": [
