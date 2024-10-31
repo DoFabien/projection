@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ProjectionsService } from '../shared/projections.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -29,15 +29,17 @@ export class BboxToCoordsComponent implements OnInit, OnDestroy {
   subscriptionProjectionCodeChange;
   subscriptionNewFilter;
 
-  constructor(public projectionsService: ProjectionsService) {
+  constructor(public projectionsService: ProjectionsService, private cd: ChangeDetectorRef) {
     /* SUBSCRIPTION */
     this.subscriptionDataLoad = projectionsService.eventProjsectionsLoaded.subscribe((data) => {
       this.data = data;
+      this.cd.detectChanges();
     });
 
     this.subscriptionProjectionCodeChange = projectionsService.eventProjectionCodeSelect.subscribe((data) => {
       this.selectedProjection = projectionsService.getProjectionByCode(data.code, this.data);
       this.coordsFormatString = this.getBboxFormat(this.currentFormat);
+      this.cd.detectChanges();
     });
 
     this.subscriptionNewData = projectionsService.eventNewBbox.subscribe((data) => {
@@ -45,7 +47,10 @@ export class BboxToCoordsComponent implements OnInit, OnDestroy {
       if (this.selectedProjection.code) {
         this.selectedProjection = projectionsService.getProjectionByCode(this.selectedProjection.code, data);
         this.coordsFormatString = this.getBboxFormat(this.currentFormat);
+        
       }
+      this.cd.detectChanges();
+      
     });
 
     this.subscriptionNewFilter = projectionsService.eventFilterTextChange.subscribe((data) => {
