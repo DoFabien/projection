@@ -27,14 +27,11 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterModule, FormsModule,
-    MatButtonModule, MatDividerModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSlideToggleModule, MatTooltipModule, LeafletModule  ],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss', '../../node_modules/leaflet/dist/leaflet.css'],
-  // providers: [MdUniqueSelectionDispatcher],
-  // viewProviders: [MdIconRegistry]
+    selector: 'app-root',
+    imports: [CommonModule, RouterOutlet, RouterModule, FormsModule,
+        MatButtonModule, MatDividerModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSlideToggleModule, MatTooltipModule, LeafletModule],
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss', '../../node_modules/leaflet/dist/leaflet.css']
 })
 
 export class AppComponent implements OnInit, OnDestroy, AfterViewInit {

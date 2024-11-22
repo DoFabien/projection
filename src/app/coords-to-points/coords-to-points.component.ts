@@ -13,13 +13,12 @@ import { MatButtonModule } from '@angular/material/button';
 
 
 @Component({
-  selector: 'app-coords-to-points',
-  standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule,  MatCardModule, OrderBy,
+    selector: 'app-coords-to-points',
+    imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule, MatCardModule, OrderBy,
         MatIconModule, RoundCoords, MatButtonModule
-      ],
-  templateUrl: './coords-to-points.component.html',
-  styleUrls: ['./coords-to-points.component.scss']
+    ],
+    templateUrl: './coords-to-points.component.html',
+    styleUrls: ['./coords-to-points.component.scss']
 })
 export class CoordsToPointsComponent implements OnInit, OnDestroy {
 
