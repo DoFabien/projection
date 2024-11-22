@@ -14,13 +14,12 @@ import { RoundCoords } from '../pipes/round_coords.pipe';
 
 
 @Component({
-  selector: 'app-point-to-coords',
-  standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule,  MatCardModule, OrderBy,
+    selector: 'app-point-to-coords',
+    imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule, MatCardModule, OrderBy,
         MatIconModule, RoundCoords
-      ],
-  templateUrl: './point-to-coords.component.html',
-  styleUrls: ['./point-to-coords.component.scss']
+    ],
+    templateUrl: './point-to-coords.component.html',
+    styleUrls: ['./point-to-coords.component.scss']
 })
 export class PointToCoordsComponent implements OnInit, OnDestroy {
 

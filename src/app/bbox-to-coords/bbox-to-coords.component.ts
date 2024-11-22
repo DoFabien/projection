@@ -10,11 +10,10 @@ import { OrderBy } from '../pipes/order_by.pipe';
 import {MatSelectModule} from '@angular/material/select';
 
 @Component({
-  selector: 'app-bbox-to-coords',
-  templateUrl: './bbox-to-coords.component.html',
-  styleUrls: ['./bbox-to-coords.component.scss'],
-  standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule,  MatCardModule, OrderBy,MatSelectModule],
+    selector: 'app-bbox-to-coords',
+    templateUrl: './bbox-to-coords.component.html',
+    styleUrls: ['./bbox-to-coords.component.scss'],
+    imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule, MatCardModule, OrderBy, MatSelectModule]
 })
 export class BboxToCoordsComponent implements OnInit, OnDestroy {
 

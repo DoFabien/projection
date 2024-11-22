@@ -12,8 +12,7 @@ import { OrderBy } from '../pipes/order_by.pipe';
 
 @Component({
     selector: 'app-shp-to-bbox',
-    standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule, MatCardModule, OrderBy],
+    imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule, MatCardModule, OrderBy],
     templateUrl: './shp-to-bbox.component.html',
     styleUrls: ['./shp-to-bbox.component.scss']
 })
