@@ -33,18 +33,13 @@
   
   
   }
-  #containerMap{
-  
-    width:100%;
-  
+
+  #map {
     margin-top: 4px;
     position: absolute;
     top:0;
     bottom: 0;
-  
-  }
-  #map {
-      height: 100%;
+    width: 100%;
   }
   
   #rightDiv {
@@ -97,4 +92,5 @@
     align-items: center;
     justify-content: flex-start;
   }
+
   

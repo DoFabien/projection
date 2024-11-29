@@ -1,0 +1,88 @@
+<div class="formCoords">
+    <mat-form-field>
+        <mat-label>Lng (x)</mat-label>
+        <input matInput 
+            placeholder="Lng (x)"
+            [ngModel]="lng()"
+            (ngModelChange)="lng.set($event)"
+            (paste)="onPastLng($event)">
+    </mat-form-field>
+
+    <i class="material-icons pointer" (click)="reverseLngLat()">&#xE8D4;</i>
+    
+    <mat-form-field>
+        <mat-label>Lat (y)</mat-label>
+        <input matInput 
+            placeholder="Lat (y)"
+            [ngModel]="lat()"
+            (ngModelChange)="lat.set($event)">
+    </mat-form-field>
+</div>
+
+
+
+<div class="tableData">
+    <div class="headerTable">
+        <table style="width:100%" class="coords_list">
+            <tr class="headerTableTr">
+                <th width="50px">
+                </th>
+                <th width="150px" style="max-width: 150px;">
+                    <p mat-line (click)="setOrderBy('code')" class="pointer align-left"> Code
+                        <i *ngIf="orderByField() == 'code'" class="material-icons">expand_less</i>
+                        <i *ngIf="orderByField() == '-' + 'code'" class="material-icons">expand_more</i>
+                        <i *ngIf="orderByField() != '-' + 'code' && orderByField() != 'code'" class="material-icons">remove</i>
+                    </p>
+                </th>
+                <th width="200px" style="max-width: 200px;">
+                    <p mat-line (click)="setOrderBy('name')" class="pointer align-left"> Nom
+                        <i *ngIf="orderByField() == 'name'" class="material-icons">expand_less</i>
+                        <i *ngIf="orderByField() == '-' + 'name'" class="material-icons">expand_more</i>
+                        <i *ngIf="orderByField() != '-' + 'name' && orderByField() != 'name'" class="material-icons">remove</i>
+                    </p>
+                </th>
+                <tr>
+        </table>
+    </div>
+
+
+
+    <div id="list_coord">
+        <table style="width:100%">
+            <tr class="lighting" 
+            (click)="selectProjectrionFromList(p)" 
+            [id]="p.code" *ngFor="let p of resultProjections() | orderBy: orderByField(); let i = index">
+
+               <td width="50px" style="text-align:center" >
+         <i *ngIf="selectedProjection()?.code == p.code" class="material-icons icon-selected">radio_button_checked</i>
+         <i *ngIf="selectedProjection()?.code !== p.code" class="material-icons icon-unselected">radio_button_unchecked</i>
+         <!--<mat-checkbox [checked]="(selectedProjection.code == p.code)" [disabled]="true" style="margin-left: 10px"></mat-checkbox>-->
+    </td>
+
+                <td width="150px" style="max-width: 150px;" [ngClass]="{'selected': selectedProjection()?.code == p.code }"  >
+                    <div> {{p.code}} </div>
+                </td>
+
+                <td width="200px" style="max-width: 200px;" [ngClass]="{'selected': selectedProjection()?.code == p.code }" >
+                    <div>{{p.name}}</div>
+                </td>
+
+            </tr>
+        </table>
+    </div>
+</div>
+<div id="selected_projection">
+    <mat-card>
+        <div *ngIf="selectedProjection()?.code">
+            <b>Code :</b> <a href="{{selectedProjection()?.url}}" target="_blank">
+              {{selectedProjection()?.code}} </a> <b style="margin-left: 20px;">  Région :</b>            {{selectedProjection()?.region}}
+            <br> <b>Nom :</b> {{selectedProjection()?.name}}
+        </div>
+
+        <div *ngIf="!selectedProjection()?.code && !selectedProjection()?.lng">
+            <b> Coordonées -> Points </b> <br>
+            <i>Entrer un couple de coordonées puis selectionner un système de projection  </i>
+        </div>
+
+    </mat-card>
+</div>

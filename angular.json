@@ -27,23 +27,11 @@
             "inlineStyleLanguage": "scss",
           "assets": [
             "src/favicon.ico",
-            "src/assets",
-            {
-              "glob": "**/*",
-              "input": "./node_modules/leaflet/dist/images/",
-              "output": "./"
-            },
-            {
-              "glob": "**/*.png",
-              "input": "./node_modules/leaflet-extra-markers/dist/img",
-              "output": "./assets/dist/img"
-            }
+            "src/assets"
           ],
             "styles": [
-              "@angular/material/prebuilt-themes/indigo-pink.css",
-              "node_modules/leaflet.markercluster/dist/MarkerCluster.css",
-              "node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css",
-              "src/assets/dist/css/leaflet.extra-markers.min.css",
+              "@angular/material/prebuilt-themes/deeppurple-amber.css",
+              "maplibre-gl/dist/maplibre-gl.css",
               "src/styles.scss"
             ],
             "scripts": []
