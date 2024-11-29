@@ -1,20 +1,26 @@
 import {Pipe, PipeTransform} from '@angular/core'
 
-@Pipe({name: 'myOrderBy', standalone: true,})
+@Pipe({name: 'orderBy', standalone: true,})
 
 export class OrderBy implements PipeTransform {
-    transform(objOrig: any, _orderField: string) {
-        let orderType: string = 'ASC';
-        let orderField  = _orderField;
-        let obj = JSON.parse(JSON.stringify(objOrig));
+    transform(_array: any[], field: string): any[] {
 
-        if (_orderField){
-              if (_orderField[0] === '-') {
-                orderField = _orderField.substring(1);
+        // clone array
+        const array = [..._array];
+
+        if (!array) return [];
+        if (!field) return array;
+
+        let orderType: string = 'ASC';
+        let orderField  = field;
+
+        if (field){
+              if (field[0] === '-') {
+                orderField = field.substring(1);
                 orderType = 'DESC';
             }
 
-                     obj.sort(function(a :any, b: any) {
+                     array.sort(function(a :any, b: any) {
                 if (orderType === 'ASC') {
                     if (a[orderField] < b[orderField]) return -1;
                     if (a[orderField] > b[orderField]) return 1;
@@ -28,6 +34,6 @@ export class OrderBy implements PipeTransform {
 
         }
 
-        return obj;
+        return array;
     }
 }

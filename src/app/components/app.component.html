@@ -27,19 +27,6 @@
 
     <button mat-raised-button color="primary"
       class="toolbarElems"
-      [disabled]="this.router.url == '/shp-to-bbox'" 
-      [routerLink]="['shp-to-bbox']"
-      matTooltip=".shp -> map (bounding box)"
-      tooltip-position="below">
-      <div style="display: flex;flex-direction: row; align-items: center;">
-        <span>.shp</span>
-        <mat-icon>keyboard_arrow_right</mat-icon>
-        <mat-icon>map</mat-icon>
-      </div>
-    </button>
-
-    <button mat-raised-button color="primary"
-      class="toolbarElems"
       [disabled]="this.router.url == '/bbox-to-coords'" 
       [routerLink]="['bbox-to-coords']"
       matTooltip="Bounding box -> coordonnées" tooltip-position="below">
@@ -54,14 +41,14 @@
 
 
 
-    <form autocomplete="off" style="display: flex;flex-direction: row;align-items: center;" (ngSubmit)="geocode(geocodeText)">
+    <form autocomplete="off" style="display: flex;flex-direction: row;align-items: center;" (ngSubmit)="geocode(geocodeText())">
       <mat-form-field>
           <input matInput  name="Se localiser" placeholder="Rechercher un lieu" [(ngModel)]="geocodeText">
-          <mat-icon matSuffix (click) = "geocodeText = ''" style = "vertical-align: bottom; cursor: pointer;" >clear</mat-icon>
+          <mat-icon matSuffix (click) = "geocodeText.set('')" style = "vertical-align: bottom; cursor: pointer;" >clear</mat-icon>
         </mat-form-field>
 
       <button mat-mini-fab type="submit"
-        [disabled]="!geocodeText || geocodeText == ''"
+        [disabled]="!geocodeText() || geocodeText() == ''"
         class="toolbarElems">
                 <mat-icon>location_on</mat-icon>
         </button>
@@ -75,48 +62,64 @@
 
         <span class="spacer"></span>
 
-    <form id="filterForm" (ngSubmit)="this.projectionsService.setFilterText(filterText)"
-        autocomplete="off" style="    display: flex;flex-direction: row; align-items: center;margin-right: 2em;">
+    <form id="filterForm" (ngSubmit)="undefined" autocomplete="off" 
+          style="display: flex;flex-direction: row; align-items: center;margin-right: 2em;">
         <mat-form-field>
-            <input matInput  name="filter"  #filter [(ngModel)]="filterText" placeholder="Filtrer par nom ou SRID">
-            <mat-icon matSuffix (click)="this.projectionsService.setFilterText(''); filterText=''; " style = "vertical-align: bottom; cursor: pointer;" >clear</mat-icon>
-          </mat-form-field>
+            <input matInput 
+                   name="filter" 
+                   #searchInput
+       
+                   placeholder="Filtrer par nom ou SRID">
+            <mat-icon matSuffix 
+                      (click)="undefined; searchInput.value = '';" 
+                      style="vertical-align: bottom; cursor: pointer;">
+                clear
+            </mat-icon>
+        </mat-form-field>
 
-        <!-- <span class="pointer" mat-suffix (click)="this.projectionsService.setFilterText(''); filterText=''; ">
-                    <i class="material-icons" style = "vertical-align: bottom; cursor: pointer;">clear</i>
-                </span> -->
 
-      <button mat-mini-fab type="submit" [disabled]="!filterText">
-                <mat-icon class="mat-24">filter_list</mat-icon>
-            </button>
     </form>
 
 
 
     <mat-slide-toggle 
     style="padding-right: 2em;"
-    [checked]="projectionsService.filterBbox" 
-    (change)='filterBoboxChange()'
+    [(ngModel)]="filterByBbox"
     name="filterBboxToggle"
     matTooltip="Exclure les systèmes de coordonnées par zone de couverture"
     tooltip-position="below">
-      Filter par Bbox
+      Filtrer par Bbox
   </mat-slide-toggle>
 
 
 </header>
 <main>
-  <div id="containerMap">
-    <div leaflet id="map"
-      [leafletOptions]="options"
-      (leafletMapReady)="onMapReady($event)"
-      [ngClass]="{'pointer': (this.router.url === '/point-to-coords' || this.router.url === '/bbox-to-coords')}">
+
+    <div id="map">
     </div>
-  </div>
+
 
 
 
 </main>
 <div id="rightDiv">
-  <router-outlet></router-outlet>
+    @if (this.router.url === '/point-to-coords') {
+        <app-point-to-coords
+          [(inputData)]="featurePointToCoordsInput"
+          [filterByBbox]="filterByBbox()"
+        />
+    }
+    @if (this.router.url === '/coords-to-points') {
+        <app-coords-to-points 
+          [filterByBbox]="filterByBbox()"
+        />
+    }
+    @if (this.router.url === '/bbox-to-coords') {
+        <app-bbox-to-coords 
+        
+        [filterByBbox]="filterByBbox()"
+        />
+    } 
+
+
 </div>

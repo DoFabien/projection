@@ -1,0 +1,63 @@
+$footerHeigth: 150px;
+
+#list_coord {
+  position: absolute;
+  top: 88px;
+  bottom: $footerHeigth;
+  width: 100%;
+  overflow: auto;
+  z-index: 0;
+
+}
+
+#list_coord tr{
+    border-bottom: black;
+    border-bottom-style: solid;
+    border-bottom-width: thin;
+
+
+}
+i {
+  vertical-align: text-top;
+}
+
+table {
+    border-collapse: collapse;
+}
+th, td {
+    border-bottom: 1px solid #ddd;
+}
+
+mat-card {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: whitesmoke;
+  margin: 10px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: $footerHeigth - 50px;
+
+}
+
+p {
+  margin-bottom: 0;
+  width: 100%;                   
+  overflow: hidden;              
+  text-overflow: ellipsis;
+}
+
+td{
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+input{
+  width: 80%;
+}
+
+#selected_projection{
+  margin-bottom: 25px;
+}

@@ -1,0 +1,87 @@
+<div>
+    <table style="width:100%" class="coords_list">
+        <tr>
+        <th width="200px" style="max-width: 200px;">
+            <p mat-line (click)="setOrderBy('code')" class="pointer"> Code
+                <i *ngIf="orderByField() == 'code'" class="material-icons">expand_less</i>
+                <i *ngIf="orderByField() == '-code'" class="material-icons">expand_more</i>
+                <i *ngIf="orderByField() != '-code' && orderByField() != 'code'" class="material-icons">remove</i>
+            </p>
+
+          <p mat-line (click)="setOrderBy('name')" class="pointer"> Nom
+                <i *ngIf="orderByField() == 'name'" class="material-icons">expand_less</i>
+                <i *ngIf="orderByField() == '-' + 'name'" class="material-icons">expand_more</i>
+                <i *ngIf="orderByField() != '-' + 'name' && orderByField() != 'name'" class="material-icons">remove</i>
+            </p>
+        </th>
+
+         <th width="200px">
+             <div class="coll_coords pointer" (click)="setOrderBy('lng')"> Lng / x
+                <i *ngIf="orderByField() == 'lng'" class="material-icons">expand_less</i>
+                <i *ngIf="orderByField() == '-' + 'lng'" class="material-icons">expand_more</i>
+                <i *ngIf="orderByField() != '-' + 'lng' && orderByField() != 'lng'" class="material-icons">remove</i>
+            </div>
+        </th>
+
+        <th width="200px">
+            <div class="coll_coords pointer" (click)="setOrderBy('lat')" class="pointer"> Lat / y
+                <i *ngIf="orderByField() == 'lat'" class="material-icons">expand_less</i>
+                <i *ngIf="orderByField() == '-' + 'lat'" class="material-icons">expand_more</i>
+                <i *ngIf="orderByField() != '-' + 'lat' && orderByField() != 'lat'" class="material-icons">remove</i>
+            </div>
+        </th>
+        <tr>
+    </table>
+
+
+</div>
+
+
+
+<div id="list_coord">
+    {{orderByField() }}
+<table  style="width:100%">
+  <tr class="lighting" (click)="selectedProjection.set(p)" *ngFor="let p of resultProjections() | orderBy:orderByField(); let i = index" >
+    <td width="50px" style="text-align:center" >
+         <i *ngIf="selectedProjection()?.code == p.code" class="material-icons icon-selected">radio_button_checked</i>
+         <i *ngIf="selectedProjection()?.code !== p.code" class="material-icons icon-unselected">radio_button_unchecked</i>
+    </td>
+    <td width="200px" [ngClass]="{'selected': selectedProjection()?.code == p.code }"  style="max-width: 200px;padding: 4px;">
+
+         <div> {{p.code}} </div> <p>  {{p.name}} </p>
+
+    </td>
+    <td width="100px">
+           {{(p.lng ?? 0) | myRoundCoords}}
+
+    </td>
+        <td width="100px">
+           {{(p.lat ?? 0) | myRoundCoords}}
+    </td>
+  </tr>
+</table>
+</div>
+
+    <mat-card id="selected_projection" >
+        <div *ngIf="selectedProjection()?.code">
+            <b>Code :</b> <a href="{{selectedProjection()?.url}}" target="_blank"> 
+                    {{selectedProjection()?.code}} </a> <b style="margin-left: 20px;"> 
+                        Région :</b> {{selectedProjection()?.region}}
+            <br> <b>Nom :</b> {{selectedProjection()?.name}}
+
+           <mat-form-field style="width: 100%;">             
+                <input matInput placeholder="Coordonnées" type="text" 
+                         [value] = "selectedProjection()?.lng +', ' + selectedProjection()?.lat"
+
+                        *ngIf="selectedProjection()?.lng">
+            </mat-form-field>    
+
+        </div>
+
+        <div *ngIf="!selectedProjection()?.code && !selectedProjection()?.lng">
+            <b> Points -> Coordonées </b> <br>
+            <i>Cliquer sur la carte puis selectionner un système de projection  </i>
+        </div>
+
+    </mat-card>
+
