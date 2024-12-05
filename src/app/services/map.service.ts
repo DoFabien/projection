@@ -25,7 +25,7 @@ export class MapService {
   initMap(elementId: string): void {
     this.map = new Map({
       container: elementId,
-      style: 'https://api.maptiler.com/maps/dataviz/style.json?key=K3kqmAaVrAgobSv6Bs6e',
+      style: 'https://api.maptiler.com/maps/dataviz/style.json?key=HXfzYwwgvYvgCbKVeRur',
       center: this.locationInit ? [this.locationInit.lng, this.locationInit.lat] : [5, 48],
       zoom: this.locationInit ? 13 : 6
     });
