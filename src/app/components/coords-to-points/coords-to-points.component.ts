@@ -14,15 +14,14 @@ import { MapService } from '../../services/map.service';
 import { GeoJSONSource } from 'maplibre-gl';
 
 
-
 @Component({
-    selector: 'app-coords-to-points',
-    standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule, MatCardModule, OrderBy,
-        MatIconModule, MatButtonModule, ReactiveFormsModule, OrderBy
-    ],
-    templateUrl: './coords-to-points.component.html',
-    styleUrls: ['./coords-to-points.component.scss']
+  selector: 'app-coords-to-points',
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule, MatFormFieldModule, MatInputModule, MatCardModule, OrderBy,
+    MatIconModule, MatButtonModule, ReactiveFormsModule, OrderBy
+  ],
+  templateUrl: './coords-to-points.component.html',
+  styleUrls: ['./coords-to-points.component.scss']
 })
 export class CoordsToPointsComponent implements OnInit, OnDestroy {
 
@@ -33,7 +32,7 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
   inputData = model<[number, number] | undefined>(undefined);
   resultProjections = signal<Projection[]>([]);
   selectedProjection = signal<Projection | undefined>(undefined);
- 
+
   private formEffect: EffectRef | undefined;
 
   lng = signal<string>('');
@@ -49,36 +48,61 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
     lat: new FormControl('', [Validators.required, Validators.pattern(/\s*?-?[0-9]*\.?[0-9]*?\s*?/)])
   });
 
-  constructor( 
+  constructor(
     public projectionsService: ProjectionsService,
-    public mapService: MapService ) {
-      this.formEffect = effect(() => {
-        const coords = this.inputData();
-        if (coords) {
-          this.coordsForm.patchValue({
-            lng: coords[0].toString(),
-            lat: coords[1].toString()
-          }, { emitEvent: false });
+    public mapService: MapService
+  ) {
+    // Effect pour la carte
+    effect(() => {
+      if (this.mapService.mapReady()) {
+        this.mapService.map.on('click', this.mapClickHandler);
+      }
+    });
+
+    // Effect pour synchroniser le formulaire avec inputData
+    this.formEffect = effect(() => {
+      const coords = this.inputData();
+      if (coords) {
+        this.coordsForm.patchValue({
+          lng: coords[0].toString(),
+          lat: coords[1].toString()
+        }, { emitEvent: false });
+      }
+    });
+
+    // Effect pour mettre à jour les projections quand lng/lat ou le filtre changent
+    effect(() => {
+      const lng = this.lng();
+      const lat = this.lat();
+      const filterBbox = this.filterByBbox(); // On surveille aussi le filtre
+      if (lng && lat) {
+        const _lng = Number(lng);
+        const _lat = Number(lat);
+        if (this.coordIsValid(_lng, 'lng') && this.coordIsValid(_lat, 'lat')) {
+          this.resultProjections.set(this.projectionsService.getProjectionsToWGS84(_lng, _lat, filterBbox));
+          
+          let features: GeoJSON.Feature[] = [];
+          for (const projection of this.resultProjections()) {
+            if (!projection.lng || !projection.lat) continue;
+            features.push({
+              type: 'Feature',
+              properties: { code: projection.code, name: projection.name, region: projection.region },
+              geometry: { type: 'Point', coordinates: [projection.lng, projection.lat] }
+            });
+          }
+          this.drawFeateurs(features);
         }
-      });
-
-      effect(() => {
-          this.setInputData([this.lng(), this.lat()]);
-
-      });
+      }
+    });
   }
 
   ngOnInit() {
-    if (!this.mapService.map) return;
-    this.mapService.map.on('click', this.mapClickHandler);
-    this.setInputData([this.lng(), this.lat()]);
-
   }
 
   private coordIsValid(coord: string | number | null | undefined, type: 'lng' | 'lat'): boolean {
     if (coord === null || coord === undefined || coord === '') return false;
     const num = typeof coord === 'string' ? Number(coord) : coord;
-    if (isNaN(num) ||  !isFinite(num) ){
+    if (isNaN(num) || !isFinite(num)) {
       return false;
     }
 
@@ -90,13 +114,14 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.mapService.map.off('click', this.mapClickHandler);
 
-    const geojson: GeoJSON.GeoJSON = {type: 'FeatureCollection',features:[]}
+    const geojson: GeoJSON.GeoJSON = { type: 'FeatureCollection', features: [] }
     const source = this.mapService.map.getSource('coordsToPoints') as GeoJSONSource;
     source?.setData(geojson);
     this.formEffect?.destroy();
   }
 
-  drawFeateurs(features: GeoJSON.Feature[]):void{
+  drawFeateurs(features: GeoJSON.Feature[]): void {
+    if (!this.mapService.map) return;
     const geojson: GeoJSON.GeoJSON = {
       type: 'FeatureCollection',
       features: features
@@ -109,10 +134,10 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
     return !!coords && coords.length === 2 && this.coordIsValid(coords[0], 'lng') && this.coordIsValid(coords[1], 'lat');
   }
 
-  setInputData(coords: [string, string] | undefined) {
+  setInputData(coords: [string | number, string | number] | undefined) {
     let errorInput = [];
-    const lng = coords?.[0]?.trim();
-    const lat = coords?.[1]?.trim();
+    const lng = coords?.[0]?.toString()?.trim();
+    const lat = coords?.[1]?.toString()?.trim();
 
     // Vérifier d'abord si les chaînes sont vides
     if (!lng || !lat) {
@@ -124,21 +149,20 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
 
     const _lng = Number(lng);
     const _lat = Number(lat);
- 
+
     if (!this.coordIsValid(_lng, 'lng') || !this.coordIsValid(_lat, 'lat')) {
       if (!coords) errorInput.push('coords undefined');
       if (coords?.length !== 2) errorInput.push('coords length not valid');
       if (!this.coordIsValid(_lng, 'lng')) errorInput.push('coord lng not valid');
       if (!this.coordIsValid(_lat, 'lat')) errorInput.push('coord lat not valid');
-      
+
       this.resultProjections.set([]);
       this.drawFeateurs([]);
       return;
-    } 
+    }
 
-    // this.inputData.set(coords);
     this.resultProjections.set(this.projectionsService.getProjectionsToWGS84(_lng, _lat, this.filterByBbox()));
-  
+
     let features: GeoJSON.Feature[] = [];
     for (const projection of this.resultProjections()) {
       if (!projection.lng || !projection.lat) continue;
@@ -148,7 +172,7 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
         geometry: { type: 'Point', coordinates: [projection.lng, projection.lat] }
       });
     }
-  
+
     this.drawFeateurs(features);
   }
 
@@ -175,7 +199,7 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
     const features = this.mapService.map.queryRenderedFeatures(e.point, {
       layers: ['coordsToPoints-layer']
     });
-    
+
     if (features.length > 0) {
       // Un point a été cliqué
       const feature = features[0];
@@ -192,7 +216,7 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
 
   onPastLng = (e: ClipboardEvent) => {
     const data = e.clipboardData?.getData('text/plain').trim() || '';
-    
+
     // Qgis like (12.345,6.7891)
     const qgisFormat = /^(-?[0-9]+\.?[0-9]*)\s?,\s?(-?[0-9]+\.?[0-9]*)$/;
     if (qgisFormat.test(data)) {
@@ -213,7 +237,6 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
     }
   };
 
-
   setOrderBy(field: string) {
     this.orderByField.set(!this.orderByField() ? field : this.orderByField() === field ? `-${field}` : this.orderByField() === `-${field}` ? '' : field);
   }
@@ -226,7 +249,5 @@ export class CoordsToPointsComponent implements OnInit, OnDestroy {
     this.lat.set(lng);
 
   }
-
- 
 
 }

@@ -24,36 +24,39 @@ import { GeoJSONSource, LngLatLike } from 'maplibre-gl';
     templateUrl: './point-to-coords.component.html',
     styleUrls: ['./point-to-coords.component.scss']
 })
-export class PointToCoordsComponent implements OnInit, OnDestroy {
+export class PointToCoordsComponent {
 
   filterByBbox = input<boolean>(true);
   orderByField = signal<string>('');
   inputData = model<[number, number] | undefined>(undefined);
   resultProjections = signal<Projection[]>([]);
   selectedProjection = signal<Projection | undefined>(undefined);
-
+  
 
 
   constructor(
     public projectionsService: ProjectionsService,
     public mapService: MapService
   ) {
+    // Effect pour les projections
     effect(() => {
       const coords = this.inputData();
       if (!coords) return;
       const result: Projection[] = this.projectionsService.getProjsectionsFromWGS84(coords[0], coords[1], this.filterByBbox());
       this.resultProjections.set(result);
     });
+
+    // Effect pour la carte
+    effect(() => {
+      if (this.mapService.mapReady()) {
+        this.mapService.map.on('click', this.mapClickHandler);
+        this.setInputData(this.inputData());
+      }
+    });
   }
 
 
 
-
-  ngOnInit() {
-    if (!this.mapService.map) return;
-    this.mapService.map.on('click', this.mapClickHandler);
-    this.setInputData(this.inputData());
-  }
 
   ngOnDestroy() {
     this.mapService.map.off('click', this.mapClickHandler);

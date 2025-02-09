@@ -54,13 +54,19 @@ export class BboxToCoordsComponent implements OnInit, OnDestroy {
         }
       }
     }, { allowSignalWrites: true });
+
+    // Effect pour la carte
+    effect(() => {
+      if (this.mapService.mapReady()) {
+        this.setInputData(this.inputData());
+        this.mapService.map.on('click', this.mapClickHandler as (ev: MapMouseEvent) => void);
+        this.mapService.map.on('mousemove', this.mapMouseMoveHandler as (ev: MapMouseEvent) => void);
+      }
+    });
   }
 
   ngOnInit() {
-    if (!this.mapService.map) return;
-    this.setInputData(this.inputData());
-    this.mapService.map.on('click', this.mapClickHandler as (ev: MapMouseEvent) => void);
-    this.mapService.map.on('mousemove', this.mapMouseMoveHandler as (ev: MapMouseEvent) => void);
+  
   }
 
   ngOnDestroy() {
