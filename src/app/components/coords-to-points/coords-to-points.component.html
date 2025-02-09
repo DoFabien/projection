@@ -19,8 +19,6 @@
     </mat-form-field>
 </div>
 
-
-
 <div class="tableData">
     <div class="headerTable">
         <table style="width:100%" class="coords_list">
@@ -45,13 +43,11 @@
         </table>
     </div>
 
-
-
     <div id="list_coord">
         <table style="width:100%">
             <tr class="lighting" 
-            (click)="selectProjectrionFromList(p)" 
-            [id]="p.code" *ngFor="let p of resultProjections() | orderBy: orderByField(); let i = index">
+            (click)="selectProjectionFromList(p)" 
+            [id]="p.code" *ngFor="let p of resultProjections() | filter:searchTerm() | orderBy: orderByField(); let i = index">
 
                <td width="50px" style="text-align:center" >
          <i *ngIf="selectedProjection()?.code == p.code" class="material-icons icon-selected">radio_button_checked</i>

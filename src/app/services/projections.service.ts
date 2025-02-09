@@ -53,24 +53,16 @@ export class ProjectionsService {
         this.eventProjectionCodeSelect.emit(code);
     }
 
-    getFilterText() {
-        return JSON.parse(JSON.stringify(this.filterText));
-    }
-    setFilterText(text: string) {
-        this.filterText = text;
-        this.eventFilterTextChange.emit(text);
-    }
-
     getProjections(): any[] {
         return JSON.parse(JSON.stringify(this.projections));
     }
 
 
-    getFilterProjection() {
+    getFilterProjection(searchTerm: string) {
         const full_data = this.getProjections();
         let res = [];
-        const patt = new RegExp(this.getFilterText(), 'i');
-        if (this.getFilterText()) {
+        const patt = new RegExp(searchTerm, 'i');
+        if (searchTerm) {
             full_data.forEach(element => {
                 if (patt.test(element.code) || patt.test(element.name)) {
                     res.push(element);
@@ -83,9 +75,9 @@ export class ProjectionsService {
     }
 
 
-    getProjsectionsFromWGS84(lng: number, lat: number, filterByBbox: boolean) {
+    getProjsectionsFromWGS84(lng: number, lat: number, filterByBbox: boolean, searchTerm: string) {
       const proj_4326 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs';
-      const list_proj_point_to_coords = this.getFilterProjection();
+      const list_proj_point_to_coords = this.getFilterProjection(searchTerm);
       const filteredData = [];
         for (let i = 0; i < list_proj_point_to_coords.length; i++) {
 
@@ -106,9 +98,9 @@ export class ProjectionsService {
     
     }
 
-    getProjectionsToWGS84(lng: number, lat: number, filterByBbox: boolean) {
+    getProjectionsToWGS84(lng: number, lat: number, filterByBbox: boolean, searchTerm: string) {
       const proj_4326 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs';
-      const list_proj_point_to_coords = this.getFilterProjection();
+      const list_proj_point_to_coords = this.getFilterProjection(searchTerm);
       const filteredData = [];
         for (let i = 0; i < list_proj_point_to_coords.length; i++) {
           const coords_from_proj = proj4(list_proj_point_to_coords[i].proj4, proj_4326, [lng, lat]);
@@ -128,9 +120,9 @@ export class ProjectionsService {
         return filteredData
     }
 
-    getCoordsFromBbox(coords:[[number, number], [number, number]] ) {
+    getCoordsFromBbox(coords:[[number, number], [number, number]] ,  filterByBbox: boolean, searchTerm: string) {
         const proj_4326 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs';
-        const result = this.getFilterProjection();
+        const result = this.getFilterProjection(searchTerm);
         const filteredData = [];
 
         if (coords[0] && coords[1]) {

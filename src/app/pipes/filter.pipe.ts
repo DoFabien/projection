@@ -1,27 +1,18 @@
 import {Pipe, PipeTransform} from '@angular/core';
 
-@Pipe({name: 'filter'})
-
+@Pipe({
+    name: 'filter',
+    standalone: true
+})
 export class FilterPipe implements PipeTransform {
-    transform(obj: any, filterText: string) {
+    transform(items: any[], searchText: string): any[] {
+        if (!items) return [];
+        if (!searchText) return items;
 
-
-        if (filterText) {
-            let res = [];
-            let patt = new RegExp(filterText);
-            obj.forEach(element => {
-               if (patt.test(element.code) || patt.test(element.nom)){
-
-                   obj.hidden = 0;
-                   res.push(element);
-               } else {
-                   obj.hidden = 1;
-               }
-            });
-            return res;
-        }else {
-            return obj;
-        }
-
+        searchText = searchText.toLowerCase();
+        return items.filter(item => {
+            return item.code?.toLowerCase().includes(searchText) || 
+                   item.name?.toLowerCase().includes(searchText);
+        });
     }
 }
