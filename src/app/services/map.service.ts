@@ -52,6 +52,7 @@ export class MapService {
         zoom: this.locationInit ? 13 : 6
       });
 
+
       this.map.on('load', () => {
         // Source pour la géolocalisation
         this.map.addSource('userLocation', {
@@ -100,13 +101,13 @@ export class MapService {
 
         this.map.addLayer({
           id: 'pointToCoords-layer',
-          type: 'circle',
+          type: 'symbol',
           source: 'pointToCoords',
-          paint: {
-            'circle-radius': 6,
-            'circle-color': '#FF0000',
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#FFFFFF'
+          layout: {
+            'icon-image': 'projection:PointToCoord',
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true,
+            'icon-offset': [0, -14],
           }
         });
 

@@ -43,6 +43,10 @@ const configMarkers = [
     { "name": "Tunisia", "iconColor": '#FFFFFF', "markerColor": '#E70013', "iconName": "maki-circle", "shape": "circle" },  // Rouge Tunisie
     { "name": "Morocco", "iconColor": '#FFFFFF', "markerColor": '#C1272D', "iconName": "maki-circle", "shape": "circle" },  // Rouge Maroc
     { "name": "Western Sahara", "iconColor": '#FFFFFF', "markerColor": '#007A3D', "iconName": "maki-circle", "shape": "circle" },  // Vert du drapeau
+
+    // pointToCoords
+    { "name": "PointToCoord", "iconColor": '#FFFFFF', "markerColor": '#000000', "iconName": "wiki-question", "shape": "penta" },  // ? noir
+
 ]
 
 const whiteList: string[] = []

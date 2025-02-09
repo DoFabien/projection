@@ -51,6 +51,7 @@ export class PointToCoordsComponent {
       if (this.mapService.mapReady()) {
         this.mapService.map.on('click', this.mapClickHandler);
         this.setInputData(this.inputData());
+        this.mapService.map.getCanvas().style.cursor = "pointer";
       }
     });
   }
@@ -64,6 +65,7 @@ export class PointToCoordsComponent {
     const geojson: GeoJSON.GeoJSON = {type: 'FeatureCollection',features:[]}
     const source = this.mapService.map.getSource('pointToCoords') as GeoJSONSource;
     source?.setData(geojson);
+    this.mapService.map.getCanvas().style.cursor = "default";
   }
 
   setInputData(coords: [number, number] | undefined) {

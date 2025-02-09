@@ -61,3 +61,7 @@ input{
 #selected_projection{
   margin-bottom: 25px;
 }
+
+:host ::ng-deep .maplibregl-canvas {
+  cursor: pointer !important;
+}

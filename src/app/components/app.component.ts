@@ -39,7 +39,7 @@ import { Feature } from 'maplibre-gl';
 export class AppComponent implements OnInit, AfterViewInit {
 
   filterText = signal<string>('');
-  filterByBbox = model<boolean>(false);
+  filterByBbox = model<boolean>(true);
   geocodeText = signal<string>('');
 
   featurePointToCoordsInput = signal<[number, number] | undefined>(undefined);
