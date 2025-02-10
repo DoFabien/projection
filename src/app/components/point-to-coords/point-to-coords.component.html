@@ -41,7 +41,7 @@
 <div id="list_coord">
     {{orderByField() }}
 <table  style="width:100%">
-  <tr class="lighting" (click)="selectedProjection.set(p)" *ngFor="let p of resultProjections() | orderBy:orderByField(); let i = index" >
+  <tr class="lighting" (click)="selectedProjection.set(p)" *ngFor="let p of resultProjections() | filter:searchTerm() | orderBy:orderByField(); let i = index" >
     <td width="50px" style="text-align:center" >
          <i *ngIf="selectedProjection()?.code == p.code" class="material-icons icon-selected">radio_button_checked</i>
          <i *ngIf="selectedProjection()?.code !== p.code" class="material-icons icon-unselected">radio_button_unchecked</i>

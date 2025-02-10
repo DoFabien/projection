@@ -67,11 +67,11 @@
         <mat-form-field>
             <input matInput 
                    name="filter" 
-                   #searchInput
-       
-                   placeholder="Filtrer par nom ou SRID">
+                   placeholder="Filtrer par nom ou SRID"
+                   [ngModel]="searchTerm()"
+                   (ngModelChange)="searchTerm.set($event)">
             <mat-icon matSuffix 
-                      (click)="undefined; searchInput.value = '';" 
+                      (click)="searchTerm.set('')" 
                       style="vertical-align: bottom; cursor: pointer;">
                 clear
             </mat-icon>
@@ -107,17 +107,25 @@
         <app-point-to-coords
           [(inputData)]="featurePointToCoordsInput"
           [filterByBbox]="filterByBbox()"
+          [searchTerm]="searchTerm()"
+          [orderByField]="orderByField()"
+          (orderBy)="setOrderBy($event)"
         />
     }
     @if (this.router.url === '/coords-to-points') {
         <app-coords-to-points 
           [filterByBbox]="filterByBbox()"
+          [searchTerm]="searchTerm()"
+          [orderByField]="orderByField()"
+          (orderBy)="setOrderBy($event)"
         />
     }
     @if (this.router.url === '/bbox-to-coords') {
         <app-bbox-to-coords 
-        
         [filterByBbox]="filterByBbox()"
+          [searchTerm]="searchTerm()"
+          [orderByField]="orderByField()"
+          (orderBy)="setOrderBy($event)"
         />
     } 
 
