@@ -12,8 +12,15 @@ export class MapService {
   public map!: Map;
   private markers: Marker[] = [];
   private coordsBbox: LngLat[] = [];
-  private locationInit: LngLat | null = null;
   private mapStyle = signal<any | null>(null);
+  private locationInit: LngLat | null = null;
+  private readonly STORAGE_KEY = 'map-view';
+  private readonly DEFAULT_VIEW = {
+    center: [5, 48],
+    zoom: 6,
+    pitch: 0,
+    bearing: 0
+  };
   public mapReady = signal<boolean>(false);
 
   readonly featureColor = {
@@ -44,12 +51,13 @@ export class MapService {
   async initMap(elementId: string): Promise<void> {
     const style = await this.loadMapStyle();
 
+    const savedView = this.loadMapView();
+
     return new Promise<void>((resolve) => {
       this.map = new Map({
         container: elementId,
         style: style,
-        center: this.locationInit ? [this.locationInit.lng, this.locationInit.lat] : [5, 48],
-        zoom: this.locationInit ? 13 : 6
+        ...savedView
       });
 
 
@@ -134,7 +142,12 @@ export class MapService {
         });
 
         this.map.addControl(new NavigationControl());
-        this.getLocation();
+        this.getLocation(false);
+
+        // Sauvegarder la vue quand la carte bouge
+        this.map.on('moveend', () => {
+          this.saveMapView();
+        });
         
         this.mapReady.set(true);
         resolve();
@@ -152,6 +165,31 @@ export class MapService {
   }
 
 
+  private saveMapView(): void {
+    if (!this.map) return;
+
+    const center = this.map.getCenter();
+    const view = {
+      center: [center.lng, center.lat],
+      zoom: this.map.getZoom(),
+      pitch: this.map.getPitch(),
+      bearing: this.map.getBearing()
+    };
+
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(view));
+  }
+
+  private loadMapView(): any {
+    const savedView = localStorage.getItem(this.STORAGE_KEY);
+    if (savedView) {
+      try {
+        return JSON.parse(savedView);
+      } catch (e) {
+        return this.DEFAULT_VIEW;
+      }
+    }
+    return this.DEFAULT_VIEW;
+  }
 
   private addBboxToMap(coordinates: number[][]): void {
     if (!this.map.getSource('bbox')) {
@@ -221,7 +259,7 @@ export class MapService {
   }
 
 
-  getLocation(): void {
+  getLocation(centerMap: boolean): void {
     this.geocoderService.getLocation().subscribe(position => {
       const coords: [number, number] = [position.coords.longitude, position.coords.latitude];
       
@@ -240,11 +278,14 @@ export class MapService {
 
       (this.map.getSource('userLocation') as GeoJSONSource).setData(geojson);
 
-      // Centrer la carte sur la position
+      if (centerMap){
+              // Centrer la carte sur la position
       this.map.flyTo({
         center: coords,
         zoom: 13
       });
+      }
+
     });
   }
 

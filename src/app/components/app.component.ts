@@ -85,8 +85,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getLocation() {
-    this.mapService.getLocation();
+  getLocation(center: boolean = true) {
+    this.mapService.getLocation(center);
   }
 
   setOrderBy(field: string) {
