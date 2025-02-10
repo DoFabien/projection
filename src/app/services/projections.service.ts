@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, EventEmitter } from '@angular/core';
 import { bboxPolygon, booleanPointInPolygon, point } from '@turf/turf';
-import proj4 from 'proj4';
+
 import projectionsList from '../../assets/projections.json';
+import proj4 from 'proj4';
 
 @Injectable({
     providedIn: 'root',

@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "sprites": "ts-node --project ./scripts/tsconfig.json ./scripts/generateSprites.ts",
-    "test": "ng test"
+    "test": "jest --config=jest.config.ts"
   },
   "private": true,
   "dependencies": {
@@ -31,13 +31,15 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
+    "@angular-builders/jest": "^19.0.0",
     "@angular-devkit/build-angular": "^19.0.1",
     "@angular/cli": "^19.0.1",
     "@angular/compiler-cli": "^19.0.0",
+    "@angular/localize": "^19.0.0",
     "@types/express": "^4.17.17",
     "@types/fs-extra": "^11.0.4",
     "@types/geojson": "^7946.0.14",
-    "@types/jasmine": "~5.1.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "^18.18.0",
     "@types/proj4": "^2.5.5",
     "@types/spritesmith": "^3.4.5",
@@ -45,14 +47,11 @@
     "@types/xml2js": "^0.4.14",
     "cheerio": "^1.0.0",
     "fs-extra": "^11.2.0",
-    "jasmine-core": "~5.1.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
+    "jest": "^29.7.0",
+    "jest-preset-angular": "^14.5.1",
     "spritesmith": "^3.5.1",
     "svg-render": "^2.0.0",
+    "ts-jest": "^29.2.5",
     "typescript": "~5.5.4",
     "xml2js": "^0.6.2"
   }
