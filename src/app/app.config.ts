@@ -1,5 +1,6 @@
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
+import { provideExperimentalZonelessChangeDetection } from '@angular/core';
 
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -7,5 +8,11 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideClientHydration } from '@angular/platform-browser';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes, withHashLocation()), provideAnimationsAsync(),  provideHttpClient(), provideClientHydration()]
+  providers: [
+    provideExperimentalZonelessChangeDetection(),
+    provideRouter(routes, withHashLocation()), 
+    provideAnimationsAsync(),  
+    provideHttpClient(), 
+    provideClientHydration()
+  ]
 };
