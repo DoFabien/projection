@@ -37,6 +37,9 @@ yarn-error.log
 testem.log
 /typings
 
+.claude/
+CLAUDE.md
+
 # System files
 .DS_Store
 Thumbs.db

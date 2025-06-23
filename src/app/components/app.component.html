@@ -38,6 +38,20 @@
       </div>
     </button>
 
+    <button mat-raised-button color="primary"
+      class="toolbarElems"
+      [disabled]="this.router.url == '/shp-to-map'" 
+      [routerLink]="['shp-to-map']"
+      matTooltip="Fichier SHP -> Map" tooltip-position="below">
+
+      <div style="display: flex;flex-direction: row; align-items: center;">
+        <mat-icon>upload_file</mat-icon>
+        <span>.shp</span>
+        <mat-icon>keyboard_arrow_right</mat-icon>
+        <mat-icon>map</mat-icon>
+      </div>
+    </button>
+
 
 
 
@@ -103,31 +117,7 @@
 
 </main>
 <div id="rightDiv">
-    @if (this.router.url === '/point-to-coords') {
-        <app-point-to-coords
-          [(inputData)]="featurePointToCoordsInput"
-          [filterByBbox]="filterByBbox()"
-          [searchTerm]="searchTerm()"
-          [orderByField]="orderByField()"
-          (orderBy)="setOrderBy($event)"
-        />
-    }
-    @if (this.router.url === '/coords-to-points') {
-        <app-coords-to-points 
-          [filterByBbox]="filterByBbox()"
-          [searchTerm]="searchTerm()"
-          [orderByField]="orderByField()"
-          (orderBy)="setOrderBy($event)"
-        />
-    }
-    @if (this.router.url === '/bbox-to-coords') {
-        <app-bbox-to-coords 
-        [filterByBbox]="filterByBbox()"
-          [searchTerm]="searchTerm()"
-          [orderByField]="orderByField()"
-          (orderBy)="setOrderBy($event)"
-        />
-    } 
+    <router-outlet></router-outlet>
 
 
 </div>

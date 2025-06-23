@@ -14,7 +14,7 @@ export class GeocoderService {
         return this._http.get(`https://api-adresse.data.gouv.fr/search/?q=${text}&limit=1`)
             .pipe(
                 map((res: any) => {
-                    return res.features[0].geometry.coordinates.reverse();
+                    return res.features[0].geometry.coordinates;
                 }
             )
             )

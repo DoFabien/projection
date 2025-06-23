@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { bboxPolygon, booleanPointInPolygon, point } from '@turf/turf';
 
 import projectionsList from '../../assets/projections.json';
@@ -11,51 +11,32 @@ import proj4 from 'proj4';
   })
 export class ProjectionsService {
 
-
-    projections:any[] = [];
-    projectionCodeSelected?: string ;
-    filterText = '';
-    filterBbox = true;
-
-    eventProjsectionsFromWGS84 = new EventEmitter();
-    eventProjsectionsToWGS84 = new EventEmitter();
-    eventProjsectionsLoaded = new EventEmitter();
-    eventPageChange = new EventEmitter();
-    eventProjectionCodeSelect = new EventEmitter();
-    eventFilterTextChange = new EventEmitter();
-    eventNewShp = new EventEmitter();
-    eventNewBbox = new EventEmitter();
-
-
-    initCoords : any = {
-        coordsToPoints: { lng: null, lat: null },
-        pointToCoords: { lng: null, lat: null },
-        shpParams: { fileName: '', coords: null },
-        bboxToCoords: []
-    };
-
-
-    data = [];
+    // Signals pour remplacer les EventEmitters
+    projections = signal<any[]>([]);
+    projectionCodeSelected = signal<string | undefined>(undefined);
+    isLoaded = signal<boolean>(false);
+    
+    // Computed signals
+    allProjections = computed(() => this.projections());
 
     constructor(private http: HttpClient) {
         
     }
 
     loadProjections() {
-        this.projections = projectionsList;
-        this.eventProjsectionsLoaded.emit(projectionsList);
+        this.projections.set(projectionsList);
+        this.isLoaded.set(true);
     }
     getProjectionCodeSelected() {
-        return this.projectionCodeSelected;
+        return this.projectionCodeSelected();
     }
 
-    setProjectionCodeSelected(code: any) {
-        this.projectionCodeSelected = code;
-        this.eventProjectionCodeSelect.emit(code);
+    setProjectionCodeSelected(code: string | undefined) {
+        this.projectionCodeSelected.set(code);
     }
 
     getProjections(): any[] {
-        return JSON.parse(JSON.stringify(this.projections));
+        return JSON.parse(JSON.stringify(this.projections()));
     }
 
 
@@ -132,7 +113,7 @@ export class ProjectionsService {
 
             for (let i = 0; i < result.length; i++) {
               const bbox = bboxPolygon(result[i].wgs84bounds);
-                if (!this.filterBbox || (booleanPointInPolygon(point1, bbox) && booleanPointInPolygon(point2, bbox)) ) {
+                if (!filterByBbox || (booleanPointInPolygon(point1, bbox) && booleanPointInPolygon(point2, bbox)) ) {
                   const coords1 = proj4(proj_4326, result[i].proj4, [coords[0][0], coords[0][1]]);
                   const coords2 = proj4(proj_4326, result[i].proj4, [coords[1][0], coords[1][1]]);
                   const x_min: number = (coords1[0] < coords2[0]) ? coords1[0] : coords2[0];

@@ -1,4 +1,4 @@
-import { Component, model, effect, input, OnInit } from '@angular/core';
+import { Component, model, effect, input, OnInit, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { ProjectionsService } from '../../services/projections.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -11,30 +11,37 @@ import { FilterPipe } from '../../pipes/filter.pipe';
 import { MatIconModule } from '@angular/material/icon';
 import { RoundCoords } from '../../pipes/round_coords.pipe';
 import { MapService } from '../../services/map.service';
+import { GlobalStateService } from '../../services/global-state.service';
 import { GeoJSONSource } from 'maplibre-gl';
 import { BaseProjectionComponent } from '../base-projection.component';
 
 @Component({
   selector: 'app-point-to-coords',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule, RouterModule, FormsModule, MatFormFieldModule, 
     MatInputModule, MatCardModule, MatIconModule, RoundCoords, 
-    OrderBy
-, FilterPipe
+    OrderBy, FilterPipe
   ],
   templateUrl: './point-to-coords.component.html',
   styleUrls: ['./point-to-coords.component.scss']
 })
 export class PointToCoordsComponent extends BaseProjectionComponent implements OnInit {
-  filterByBbox = input<boolean>(true);
-  inputData = model<[number, number] | undefined>(undefined);
+  private globalState = inject(GlobalStateService);
+  
+  // Local signals that track global state
+  filterByBbox = signal<boolean>(true);
+  inputData = signal<[number, number] | undefined>(undefined);
 
-  constructor(
-    projectionsService: ProjectionsService,
-    mapService: MapService
-  ) {
-    super(projectionsService, mapService);
+  constructor() {
+    super(inject(ProjectionsService), inject(MapService));
+
+    // Sync with global state
+    effect(() => {
+      this.filterByBbox.set(this.globalState.filterByBbox());
+      this.inputData.set(this.globalState.featurePointToCoordsInput());
+    });
 
     // Effect for projections
     effect(() => {
@@ -63,6 +70,7 @@ export class PointToCoordsComponent extends BaseProjectionComponent implements O
         const state = JSON.parse(savedState);
         if (state.coords) {
           this.inputData.set(state.coords);
+          this.globalState.featurePointToCoordsInput.set(state.coords);
         }
       } catch (error) {
         console.error('Error loading state:', error);
@@ -92,6 +100,7 @@ export class PointToCoordsComponent extends BaseProjectionComponent implements O
   setInputData(coords: [number, number] | undefined) {
     if (!coords) return;
     this.inputData.set(coords);
+    this.globalState.featurePointToCoordsInput.set(coords);
   }
 
   private updateMapPoint(coords: [number, number]) {
@@ -122,16 +131,13 @@ export class PointToCoordsComponent extends BaseProjectionComponent implements O
   };
 
   private saveState() {
-    const state = {
-      coords: this.inputData(),
-      filterByBbox: this.filterByBbox()
-    };
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(state));
+    // State is now managed globally, no need for local storage here
   }
 
   protected override loadComponentData(data: any) {
     if (data.coords) {
       this.inputData.set(data.coords);
+      this.globalState.featurePointToCoordsInput.set(data.coords);
     }
   }
 

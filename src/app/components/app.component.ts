@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, signal, model, effect } from '@angular/core';
+import { Component, OnInit, AfterViewInit, signal, model, effect, inject } from '@angular/core';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatButtonModule} from '@angular/material/button';
@@ -12,67 +12,45 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import { MapService } from '../services/map.service';
-import { PointToCoordsComponent } from './point-to-coords/point-to-coords.component';
-import { CoordsToPointsComponent } from './coords-to-points/coords-to-points.component';
-import { BboxToCoordsComponent } from './bbox-to-coords/bbox-to-coords.component';
+import { GlobalStateService } from '../services/global-state.service';
 import { Feature } from 'maplibre-gl';
 
 @Component({
     selector: 'app-root',
     standalone: true,
     imports: [CommonModule, RouterModule, FormsModule, 
-        MatButtonModule, MatDividerModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSlideToggleModule, MatTooltipModule, 
-        PointToCoordsComponent, CoordsToPointsComponent, BboxToCoordsComponent],
+        MatButtonModule, MatDividerModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSlideToggleModule, MatTooltipModule],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, AfterViewInit {
 
-  filterText = signal<string>('');
-  searchTerm = signal<string>('');
-  filterByBbox = model<boolean>(true);
+  // Injection avec inject()
+  public projectionsService = inject(ProjectionsService);
+  public router = inject(Router);
+  private mapService = inject(MapService);
+  public globalState = inject(GlobalStateService);
+
+  // Local signals
   geocodeText = signal<string>('');
-  orderByField = signal<string>('');
 
-  featurePointToCoordsInput = signal<[number, number] | undefined>(undefined);
+  // Computed from global state
+  get searchTerm() { return this.globalState.searchTerm; }
+  get filterByBbox() { return this.globalState.filterByBbox; }
+  get orderByField() { return this.globalState.orderByField; }
+  get featurePointToCoordsInput() { return this.globalState.featurePointToCoordsInput; }
 
-  constructor(
-    public projectionsService: ProjectionsService,
-    public router: Router,
-    private mapService: MapService
-  ) {
-    router.events.subscribe(e => {
+  constructor() {
+    this.router.events.subscribe(e => {
       if (e instanceof NavigationStart) {
         this.mapService.clearMarkers();
       }
     });
 
-    // Effect pour sauvegarder l'état global
-    effect(() => {
-      const state = {
-        searchTerm: this.searchTerm(),
-        filterByBbox: this.filterByBbox(),
-        orderByField: this.orderByField()
-      };
-      localStorage.setItem('global-state', JSON.stringify(state));
-    });
   }
 
   ngOnInit() {
     this.projectionsService.loadProjections();
-    
-    // Charger l'état global
-    const savedState = localStorage.getItem('global-state');
-    if (savedState) {
-      try {
-        const state = JSON.parse(savedState);
-        if (state.searchTerm) this.searchTerm.set(state.searchTerm);
-        if (state.filterByBbox !== undefined) this.filterByBbox.set(state.filterByBbox);
-        if (state.orderByField) this.orderByField.set(state.orderByField);
-      } catch (error) {
-        console.error('Error loading global state:', error);
-      }
-    }
   }
 
   ngAfterViewInit() {
@@ -90,9 +68,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   setOrderBy(field: string) {
-    this.orderByField.set(!this.orderByField() ? field : 
-      this.orderByField() === field ? `-${field}` : 
-      this.orderByField() === `-${field}` ? '' : field
-    );
+    this.globalState.setOrderBy(field);
   }
 }

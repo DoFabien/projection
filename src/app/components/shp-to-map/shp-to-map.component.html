@@ -1,0 +1,201 @@
+<div class="container">
+  <!-- File Upload Section (only shown when no files loaded) -->
+  @if (shpBoundingBoxes().length === 0) {
+  <div class="upload-section">
+    <div 
+      class="drop-zone"
+      [class.drag-over]="isDragOver()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      (click)="fileInput.click()">
+      
+      <div class="drop-zone-content">
+        <mat-icon class="upload-icon">cloud_upload</mat-icon>
+        <p class="upload-text">
+          Drop SHP files here or click to select
+        </p>
+        <p class="upload-subtext">
+          Supports .shp files for bounding box analysis
+        </p>
+      </div>
+      
+      <input 
+        #fileInput 
+        type="file" 
+        multiple 
+        accept=".shp"
+        style="display: none"
+        (change)="onFileSelect($event)">
+    </div>
+  </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-section">
+    <mat-card class="loading-card">
+      <mat-card-content>
+        <div class="loading-content">
+          <mat-spinner diameter="40"></mat-spinner>
+          <h3>Processing SHP files...</h3>
+          <p>Extracting bounding boxes and finding matching projections</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (errorMessage() && !isLoading()) {
+  <div class="error-section">
+    <mat-card class="error-card">
+      <mat-card-content>
+        <div class="error-content">
+          <mat-icon>error</mat-icon>
+          <h3>Error</h3>
+          <p>{{ errorMessage() }}</p>
+          <button mat-raised-button color="primary" (click)="resetToUpload()">
+            <mat-icon>refresh</mat-icon>
+            Try Again
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  }
+
+  <!-- File info when loaded -->
+  @if (shpBoundingBoxes().length > 0 && !isLoading()) {
+  <div class="file-info">
+    <div class="file-info-header">
+      <h3>{{ shpBoundingBoxes()[0].filename }}</h3>
+      
+      <button mat-raised-button color="warn" (click)="resetToUpload()" class="reset-btn">
+        <mat-icon>refresh</mat-icon>
+        Reset
+      </button>
+    </div>
+    
+    <!-- Filtering progress indicator -->
+    @if (isFilteringInProgress()) {
+    <div class="filter-progress">
+      <mat-spinner diameter="20"></mat-spinner>
+      <span>Recalcul des projections en cours...</span>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Projections List -->
+  @if (allMatchingProjections().length > 0) {
+  <div>
+    <!-- Header table -->
+    <table style="width:100%" class="coords_list">
+      <tr>
+        <th width="200px" style="max-width: 200px;">
+          <p mat-line (click)="setOrderBy('code')" class="pointer"> Code
+            @if (orderByField() == 'code') {
+                <i class="material-icons">expand_less</i>
+            }
+            @if (orderByField() == '-code') {
+                <i class="material-icons">expand_more</i>
+            }
+            @if (orderByField() != '-code' && orderByField() != 'code') {
+                <i class="material-icons">remove</i>
+            }
+          </p>
+          <p mat-line (click)="setOrderBy('name')" class="pointer"> Nom
+            @if (orderByField() == 'name') {
+                <i class="material-icons">expand_less</i>
+            }
+            @if (orderByField() == '-name') {
+                <i class="material-icons">expand_more</i>
+            }
+            @if (orderByField() != '-name' && orderByField() != 'name') {
+                <i class="material-icons">remove</i>
+            }
+          </p>
+        </th>
+        <th width="400px">
+          <div class="coll_coords">Bounding box SHP reprojetée en WGS84 (4 points)</div>
+        </th>
+      </tr>
+    </table>
+
+    <!-- Projections List Table -->
+    <div id="list_coord">
+      <table style="width:100%">
+        @for (p of allMatchingProjections() | filter:searchTerm() | orderBy:orderByField(); track p.code; let i = $index) {
+        <tr class="lighting" (click)="selectProjectionFromList(p)" 
+            [attr.data-projection-code]="p.code">
+          <td width="50px" style="text-align:center">
+            @if (selectedProjection()?.code == p.code) {
+                <i class="material-icons icon-selected">radio_button_checked</i>
+            } @else {
+                <i class="material-icons icon-unselected">radio_button_unchecked</i>
+            }
+          </td>
+          <td width="200px" [ngClass]="{'selected': selectedProjection()?.code == p.code }" style="max-width: 200px;padding: 4px;">
+            <div> {{p.code}} </div> 
+            <p>  {{p.name}} </p>
+          </td>
+          <td width="400px" class="polygon-coords">
+            @if (p.reprojectedPolygon) {
+            <div class="polygon-display">
+              @for (point of p.reprojectedPolygon?.slice(0, 4); track i; let i = $index) {
+              <div class="point-coords">
+                Point {{i+1}}: {{point[0] | myRoundCoords}}, {{point[1] | myRoundCoords}}
+              </div>
+              }
+            </div>
+            } @else {
+              <span class="no-polygon">Polygon non disponible</span>
+            }
+          </td>
+        </tr>
+        }
+      </table>
+    </div>
+
+    <!-- Selected Projection Card -->
+    <mat-card id="selected_projection">
+      @if (selectedProjection()?.code) {
+      <div>
+        <b>Code :</b> <a href="{{selectedProjection()?.url}}" target="_blank"> 
+          {{selectedProjection()?.code}} </a> 
+        <b style="margin-left: 20px;"> Région :</b> {{selectedProjection()?.region}}
+        <br> <b>Nom :</b> {{selectedProjection()?.name}}
+        
+        @if (selectedProjection()?.reprojectedPolygon) {
+        <div class="selected-polygon">
+          <b>Bounding box SHP reprojetée en WGS84 :</b>
+          <div class="polygon-coordinates">
+            @for (point of selectedProjection()?.reprojectedPolygon?.slice(0, 4); track i; let i = $index) {
+            <div class="point-line">
+              Point {{i+1}}: {{point[0] | myRoundCoords}}, {{point[1] | myRoundCoords}}
+            </div>
+            }
+          </div>
+        </div>
+        }    
+      </div>
+      } @else {
+      <div>
+        <b>SHP -> Projections</b> <br>
+        <i>{{ selectedShpBbox()?.filename ? 'Sélectionner une projection pour ' + selectedShpBbox()?.filename : 'Déposer un fichier SHP et sélectionner une projection' }}</i>
+      </div>
+      }
+    </mat-card>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (shpBoundingBoxes().length === 0 && !isLoading()) {
+  <div class="empty-state">
+    <mat-icon class="empty-icon">map</mat-icon>
+    <h3>No SHP files loaded</h3>
+    <p>Upload SHP files to analyze their bounding boxes and find matching coordinate projections.</p>
+  </div>
+  }
+</div>
